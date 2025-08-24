@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+  >
+  <title>IoT HoneyNet - Live Attacks</title>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body>
+  <div class="relative flex size-full min-h-screen flex-col bg-[#101816] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col">
+      
+      <!-- Header with Navigation -->
+      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#273a34] px-10 py-3">
+        <div class="flex items-center gap-4 text-white">
+          <div class="size-4" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C4 35.0457 40.7439 44 36.7273 44Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <h1 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">IoT HoneyNet</h1>
+        </div>
+        
+        <div class="flex flex-1 justify-end gap-8">
+          <!-- Main Navigation -->
+          <nav class="flex items-center gap-9" aria-label="Main navigation">
+            <a href="index.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Dashboard</a>
+            <a href="alerts.html" class="text-white text-sm font-medium leading-normal border-b-2 border-[#0bda49] pb-1 transition-colors" aria-current="page">Live Attacks</a>
+            <a href="devices.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Device Status</a>
+            <a href="reports.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Analytics</a>
+          </nav>
+          
+          <!-- Notifications and Profile -->
+          <button
+            id="notification-btn"
+            class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#273a34] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 hover:bg-[#2e6b58] transition-colors"
+            aria-label="Notifications"
+          >
+            <div class="text-white" data-icon="Bell" data-size="20px" data-weight="regular" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"
+                />
+              </svg>
+            </div>
+            <span id="notification-count" class="bg-red-500 text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">5</span>
+          </button>
+          
+          <div
+            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-[#0bda49] transition-all"
+            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAE41sOSYBxEzn--B6FYYMPws_-3FMru6RnUSACp6jQ7xiqCqyWXCYkcvPks5bdG86p42HJrgxWymHjPJGp-FH9_K8M9VCs-lK5jImI_l1pYpxsbuKQoOo2GFZRmpyEnUy8zpRk0JNIzh3QYY_0BWVzc5ws65sgoYkrnd-hGI-CMWHUDVdtUmgkosw_ouM9BfraYuzdZTDK7uzCuslAPEYDMrZlkdveizQ_B8Yqbi1kqB31BXWVyM4ZmxzWE6Wq6K9tJmjGylumKcE");'
+            role="img"
+            aria-label="User profile picture"
+          />
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="px-40 flex flex-1 justify-center py-5">
+        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+          
+          <!-- Page Header with Live Status -->
+          <div class="flex flex-wrap justify-between gap-3 p-4">
+            <div class="flex items-center gap-4">
+              <h1 class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Real-time Attack Feed</h1>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse" aria-label="Live status"></div>
+                <span class="text-red-400 text-sm font-medium">LIVE</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-[#9abcb1]">
+              <span>Auto-refresh:</span>
+              <span id="refresh-countdown" class="font-mono text-[#0bda49]">30s</span>
+            </div>
+          </div>
+          
+          <!-- Attack Statistics Summary -->
+          <section class="px-4 py-3" aria-label="Attack statistics">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-[#1b2824] rounded-lg p-4 border border-[#39564d]">
+                <h3 class="text-[#9abcb1] text-sm font-medium mb-1">Active Attacks</h3>
+                <p id="active-attacks" class="text-white text-2xl font-bold">23</p>
+                <p class="text-red-400 text-xs">↑ +5 in last minute</p>
+              </div>
+              
+              <div class="bg-[#1b2824] rounded-lg p-4 border border-[#39564d]">
+                <h3 class="text-[#9abcb1] text-sm font-medium mb-1">Blocked Today</h3>
+                <p id="blocked-today" class="text-white text-2xl font-bold">1,847</p>
+                <p class="text-green-400 text-xs">↑ 12% vs yesterday</p>
+              </div>
+              
+              <div class="bg-[#1b2824] rounded-lg p-4 border border-[#39564d]">
+                <h3 class="text-[#9abcb1] text-sm font-medium mb-1">Unique Sources</h3>
+                <p id="unique-sources" class="text-white text-2xl font-bold">156</p>
+                <p class="text-yellow-400 text-xs">From 43 countries</p>
+              </div>
+              
+              <div class="bg-[#1b2824] rounded-lg p-4 border border-[#39564d]">
+                <h3 class="text-[#9abcb1] text-sm font-medium mb-1">Most Targeted</h3>
+                <p class="text-white text-2xl font-bold">Camera</p>
+                <p class="text-orange-400 text-xs">67% of attacks</p>
+              </div>
+            </div>
+          </section>
+          
+          <!-- Filter Controls -->
+          <div class="flex gap-3 p-3 flex-wrap pr-4">
+            <div class="relative">
+              <select id="attack-filter" class="h-8 rounded-xl bg-[#273a34] text-white text-sm font-medium px-4 pr-8 border-0 cursor-pointer focus:ring-2 focus:ring-[#0bda49]">
+                <option value="all">All Attack Types</option>
+                <option value="ddos">DDoS</option>
+                <option value="bruteforce">Brute Force</option>
+                <option value="malware">Malware</option>
+                <option value="sql">SQL Injection</option>
+                <option value="xss">XSS</option>
+              </select>
+            </div>
+            
+            <div class="relative">
+              <select id="severity-filter" class="h-8 rounded-xl bg-[#273a34] text-white text-sm font-medium px-4 pr-8 border-0 cursor-pointer focus:ring-2 focus:ring-[#0bda49]">
+                <option value="all">All Severities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            
+            <div class="relative">
+              <select id="device-filter" class="h-8 rounded-xl bg-[#273a34] text-white text-sm font-medium px-4 pr-8 border-0 cursor-pointer focus:ring-2 focus:ring-[#0bda49]">
+                <option value="all">All Devices</option>
+                <option value="camera">Security Camera</option>
+                <option value="thermostat">Smart Thermostat</option>
+                <option value="lock">Smart Lock</option>
+                <option value="router">Router</option>
+              </select>
+            </div>
+            
+            <button id="clear-filters" class="h-8 px-4 rounded-xl bg-[#39564d] hover:bg-[#4a6b5f] text-white text-sm font-medium transition-colors">
+              Clear Filters
+            </button>
+            
+            <button id="pause-feed" class="h-8 px-4 rounded-xl bg-[#0bda49] hover:bg-[#0bc441] text-black text-sm font-medium transition-colors ml-auto">
+              ⏸ Pause Feed
+            </button>
+          </div>
+          
+          <!-- Real-time Attack Feed Table -->
+          <section class="px-4 py-3">
+            <div class="flex overflow-hidden rounded-xl border border-[#39564d] bg-[#101816]">
+              <div class="w-full overflow-x-auto">
+                <table class="w-full" role="table" aria-label="Real-time attack feed">
+                  <thead>
+                    <tr class="bg-[#1b2824]">
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Timestamp</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Source IP</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Target Device</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Attack Type</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Severity</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Status</th>
+                      <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attack-feed-table">
+                    <!-- Dynamic content will be inserted here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+          
+          <!-- Attack Details Modal (Hidden by default) -->
+          <div id="attack-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-[#1b2824] rounded-xl border border-[#39564d] p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-white text-xl font-bold">Attack Details</h2>
+                <button id="close-modal" class="text-[#9abcb1] hover:text-white text-2xl">&times;</button>
+              </div>
+              <div id="modal-content" class="text-[#9abcb1] space-y-4">
+                <!-- Dynamic content will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Real-time Attack Feed JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Live Attack Feed Loaded');
+      
+      let isPaused = false;
+      let refreshCountdown = 30;
+      let attackData = [];
+      
+      // Sample attack data
+      const sampleAttacks = [
+        { ip: '192.168.1.100', device: 'Security Camera', type: 'Brute Force', severity: 'High', status: 'Blocked', country: 'CN' },
+        { ip: '10.0.0.50', device: 'Smart Thermostat', type: 'DDoS', severity: 'Medium', status: 'Monitoring', country: 'RU' },
+        { ip: '172.16.0.20', device: 'Smart Lock', type: 'SQL Injection', severity: 'High', status: 'Blocked', country: 'US' },
+        { ip: '203.0.113.45', device: 'Router', type: 'Malware', severity: 'Low', status: 'Detected', country: 'IN' },
+        { ip: '198.51.100.78', device: 'Security Camera', type: 'XSS', severity: 'Medium', status: 'Blocked', country: 'DE' }
+      ];
+      
+      // Generate attack table row
+      function createAttackRow(attack) {
+        const now = new Date();
+        const timestamp = now.toLocaleString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        
+        const severityColors = {
+          'High': 'bg-red-600',
+          'Medium': 'bg-yellow-600',
+          'Low': 'bg-green-600'
+        };
+        
+        const statusColors = {
+          'Blocked': 'bg-red-600',
+          'Monitoring': 'bg-yellow-600',
+          'Detected': 'bg-blue-600'
+        };
+        
+        return `
+          <tr class="border-t border-t-[#39564d] attack-row animate-pulse" data-attack='${JSON.stringify(attack)}'>
+            <td class="h-[72px] px-4 py-2 text-[#9abcb1] text-sm font-normal leading-normal font-mono">${timestamp}</td>
+            <td class="h-[72px] px-4 py-2 text-[#9abcb1] text-sm font-normal leading-normal">
+              <div class="flex items-center gap-2">
+                <span>${attack.ip}</span>
+                <span class="text-xs bg-[#39564d] px-2 py-1 rounded">${attack.country}</span>
+              </div>
+            </td>
+            <td class="h-[72px] px-4 py-2 text-[#9abcb1] text-sm font-normal leading-normal">${attack.device}</td>
+            <td class="h-[72px] px-4 py-2 text-[#9abcb1] text-sm font-normal leading-normal">${attack.type}</td>
+            <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+              <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${severityColors[attack.severity]} text-white text-sm font-medium">
+                ${attack.severity}
+              </span>
+            </td>
+            <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+              <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${statusColors[attack.status]} text-white text-sm font-medium">
+                ${attack.status}
+              </span>
+            </td>
+            <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+              <button class="view-details text-[#0bda49] hover:text-[#0bc441] font-bold text-sm transition-colors">
+                View Details
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+      
+      // Update attack feed
+      function updateAttackFeed() {
+        if (isPaused) return;
+        
+        const tableBody = document.getElementById('attack-feed-table');
+        const randomAttack = sampleAttacks[Math.floor(Math.random() * sampleAttacks.length)];
+        
+        // Add new attack to beginning
+        const newRow = createAttackRow({
+          ...randomAttack,
+          ip: generateRandomIP()
+        });
+        
+        tableBody.insertAdjacentHTML('afterbegin', newRow);
+        
+        // Remove animation after 2 seconds
+        setTimeout(() => {
+          const newRowElement = tableBody.firstElementChild;
+          if (newRowElement) {
+            newRowElement.classList.remove('animate-pulse');
+          }
+        }, 2000);
+        
+        // Keep only last 20 attacks
+        const rows = tableBody.querySelectorAll('tr');
+        if (rows.length > 20) {
+          for (let i = 20; i < rows.length; i++) {
+            rows[i].remove();
+          }
+        }
+        
+        // Update statistics
+        updateStatistics();
+      }
+      
+      // Generate random IP
+      function generateRandomIP() {
+        return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+      }
+      
+      // Update statistics
+      function updateStatistics() {
+        const activeAttacks = document.getElementById('active-attacks');
+        const blockedToday = document.getElementById('blocked-today');
+        const uniqueSources = document.getElementById('unique-sources');
+        const notificationCount = document.getElementById('notification-count');
+        
+        if (activeAttacks) {
+          let current = parseInt(activeAttacks.textContent);
+          current += Math.floor(Math.random() * 3) - 1; // -1 to +1
+          activeAttacks.textContent = Math.max(0, current);
+        }
+        
+        if (blockedToday) {
+          let current = parseInt(blockedToday.textContent.replace(',', ''));
+          current += Math.floor(Math.random() * 5);
+          blockedToday.textContent = current.toLocaleString();
+        }
+        
+        if (uniqueSources) {
+          let current = parseInt(uniqueSources.textContent);
+          if (Math.random() > 0.8) current += 1;
+          uniqueSources.textContent = current;
+        }
+        
+        if (notificationCount) {
+          const count = Math.floor(Math.random() * 8) + 1;
+          notificationCount.textContent = count;
+        }
+      }
+      
+      // Countdown timer
+      function updateCountdown() {
+        if (isPaused) {
+          document.getElementById('refresh-countdown').textContent = 'PAUSED';
+          return;
+        }
+        
+        refreshCountdown--;
+        if (refreshCountdown <= 0) {
+          refreshCountdown = 30;
+          updateAttackFeed();
+        }
+        document.getElementById('refresh-countdown').textContent = refreshCountdown + 's';
+      }
+      
+      // Event listeners
+      document.getElementById('pause-feed').addEventListener('click', function() {
+        isPaused = !isPaused;
+        this.innerHTML = isPaused ? '▶ Resume Feed' : '⏸ Pause Feed';
+        this.className = isPaused ? 
+          'h-8 px-4 rounded-xl bg-[#39564d] hover:bg-[#4a6b5f] text-white text-sm font-medium transition-colors ml-auto' :
+          'h-8 px-4 rounded-xl bg-[#0bda49] hover:bg-[#0bc441] text-black text-sm font-medium transition-colors ml-auto';
+      });
+      
+      // Modal functionality
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('view-details')) {
+          const row = e.target.closest('tr');
+          const attackData = JSON.parse(row.dataset.attack);
+          showAttackModal(attackData);
+        }
+        
+        if (e.target.id === 'close-modal' || e.target.id === 'attack-modal') {
+          document.getElementById('attack-modal').classList.add('hidden');
+        }
+      });
+      
+      function showAttackModal(attack) {
+        const modal = document.getElementById('attack-modal');
+        const content = document.getElementById('modal-content');
+        
+        content.innerHTML = `
+          <div class="grid grid-cols-2 gap-4">
+            <div><strong>Source IP:</strong> ${attack.ip}</div>
+            <div><strong>Country:</strong> ${attack.country}</div>
+            <div><strong>Target Device:</strong> ${attack.device}</div>
+            <div><strong>Attack Type:</strong> ${attack.type}</div>
+            <div><strong>Severity:</strong> ${attack.severity}</div>
+            <div><strong>Status:</strong> ${attack.status}</div>
+          </div>
+          <div class="mt-4">
+            <strong>Attack Description:</strong>
+            <p class="mt-2 text-sm">This ${attack.type.toLowerCase()} attack was detected targeting the ${attack.device.toLowerCase()}. The attack originated from ${attack.ip} and has been automatically ${attack.status.toLowerCase()}.</p>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Block IP</button>
+            <button class="px-4 py-2 bg-[#39564d] text-white rounded-lg hover:bg-[#4a6b5f] transition-colors">Add to Whitelist</button>
+            <button class="px-4 py-2 bg-[#0bda49] text-black rounded-lg hover:bg-[#0bc441] transition-colors">Export Report</button>
+          </div>
+        `;
+        
+        modal.classList.remove('hidden');
+      }
+      
+      // Initialize with some sample data
+      for (let i = 0; i < 10; i++) {
+        const randomAttack = sampleAttacks[Math.floor(Math.random() * sampleAttacks.length)];
+        const tableBody = document.getElementById('attack-feed-table');
+        tableBody.insertAdjacentHTML('beforeend', createAttackRow({
+          ...randomAttack,
+          ip: generateRandomIP()
+        }));
+      }
+      
+      // Start timers
+      setInterval(updateCountdown, 1000);
+      setInterval(updateAttackFeed, 3000);
+      
+      console.log('Live Attack Feed fully initialized');
+    });
+  </script>
+</body>
+</html>

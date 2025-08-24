@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+  >
+  <title>IoT HoneyNet - Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Socket.IO Client Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.4/socket.io.js"></script>
+</head>
+
+<body>
+  <div class="relative flex size-full min-h-screen flex-col bg-[#0f241d] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col">
+      
+      <!-- Header with Navigation -->
+      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#204b3d] px-10 py-3">
+        <div class="flex items-center gap-4 text-white">
+          <div class="size-4" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <h1 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">IoT HoneyNet</h1>
+        </div>
+        
+        <div class="flex flex-1 justify-end gap-8">
+          <!-- Connection Status Indicator -->
+          <div id="connection-status" class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#204b3d]">
+            <div id="status-dot" class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <span id="status-text" class="text-white text-xs">Connecting...</span>
+          </div>
+          
+          <!-- WebSocket Status Indicator -->
+          <div id="websocket-status" class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#204b3d]">
+            <div id="ws-status-dot" class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <span id="ws-status-text" class="text-white text-xs">WS: Connecting...</span>
+          </div>
+          
+          <!-- Main Navigation -->
+          <nav class="flex items-center gap-9" aria-label="Main navigation">
+            <a href="index.html" class="text-white text-sm font-medium leading-normal border-b-2 border-[#0bda49] pb-1 transition-colors" aria-current="page">Dashboard</a>
+            <a href="alerts.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Live Attacks</a>
+            <a href="devices.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Device Status</a>
+            <a href="reports.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Analytics</a>
+          </nav>
+          
+          <!-- Notifications and Profile -->
+          <button
+            id="notification-btn"
+            class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#204b3d] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 hover:bg-[#2e6b58] transition-colors"
+            aria-label="Notifications"
+          >
+            <div class="text-white" data-icon="Bell" data-size="20px" data-weight="regular" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"
+                />
+              </svg>
+            </div>
+            <span id="notification-count" class="bg-red-500 text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">0</span>
+          </button>
+          
+          <div
+            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-[#0bda49] transition-all"
+            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBSMBViPO_Pb2toadLTe-Jme3aZUC_Z_IDekDXp2SGKVxdkHdHJ2TXfrG6GRpS3qidf8-whZvwBuKtX_zquBnCf1cz3yQA5fVBjwh7FRFwHHuZUjnJ50CwioLaC-VGu_a9oDu8qshmXU3RChqSEWgZx1I4gzI4fGpVYrMlFf67l9i-3gnvukHu_StFxSiOk-V80VNTnNZRdFTgf6bPZYaWniAK3i_pF8EkT-ZPjWiPOycJMt7dIRR_HjZiHSrhYUpKcz2ATzSudAI4");'
+            role="img"
+            aria-label="User profile picture"
+          />
+        </div>
+      </header>
+
+      <!-- Main Dashboard Content -->
+      <main class="gap-1 px-6 flex flex-1 justify-center py-5">
+        <!-- Sidebar Navigation -->
+        <aside class="layout-content-container flex flex-col w-80">
+          <nav class="flex h-full min-h-[700px] flex-col justify-between bg-[#0f241d] p-4" aria-label="Dashboard navigation">
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-2">
+                
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#204b3d] hover:bg-[#2e6b58] transition-colors" aria-current="page">
+                  <div class="text-white" data-icon="House" data-size="24px" data-weight="fill" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.55a16,16,0,0,1,5.17-11.78l80-75.48.11-.11a16,16,0,0,1,21.53,0,1.14,1.14,0,0,0,.11.11l80,75.48A16,16,0,0,1,224,115.55Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-medium leading-normal">Dashboard</span>
+                </a>
+                
+                <a href="alerts.html" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#204b3d] transition-colors">
+                  <div class="text-white" data-icon="Shield" data-size="24px" data-weight="regular" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M208,40H48A16,16,0,0,0,32,56v58.77c0,89.61,75.82,119.34,91,124.39a15.53,15.53,0,0,0,10,0c15.2-5.05,91-34.78,91-124.39V56A16,16,0,0,0,208,40Zm0,74.79c0,78.42-66.35,104.62-80,109.18-13.53-4.51-80-30.69-80-109.18V56l160,0Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-medium leading-normal">Live Attacks</span>
+                  <span class="ml-auto bg-red-500 text-xs text-white px-2 py-1 rounded-full animate-pulse">Live</span>
+                </a>
+                
+                <a href="devices.html" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#204b3d] transition-colors">
+                  <div class="text-white" data-icon="DeviceMobile" data-size="24px" data-weight="regular" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16ZM72,64H184V192H72Zm8-32h96a8,8,0,0,1,8,8v8H72V40A8,8,0,0,1,80,32Zm96,192H80a8,8,0,0,1-8-8v-8H184v8A8,8,0,0,1,176,224Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-medium leading-normal">Device Status</span>
+                  <span id="device-count" class="ml-auto text-[#0bda49] text-xs font-bold">0</span>
+                </a>
+                
+                <a href="reports.html" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#204b3d] transition-colors">
+                  <div class="text-white" data-icon="ChartLine" data-size="24px" data-weight="regular" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0v94.37L90.73,98a8,8,0,0,1,10.07-.38l58.81,44.11L218.73,90a8,8,0,1,1,10.54,12l-64,56a8,8,0,0,1-10.07.38L96.39,114.29,40,163.63V200H224A8,8,0,0,1,232,208Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-medium leading-normal">Analytics</span>
+                </a>
+                
+                <button class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#204b3d] transition-colors">
+                  <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"/>
+                    </svg>
+                  </div>
+                  <span class="text-white text-sm font-medium leading-normal">Settings</span>
+                </button>
+              </div>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+          <!-- Page Title -->
+          <div class="flex flex-wrap justify-between gap-3 p-4">
+            <h1 class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Dashboard</h1>
+            <div class="flex items-center gap-2 text-sm text-[#8dceb9]">
+              <span>Last Updated:</span>
+              <span id="last-updated" class="font-mono text-[#0bda49]">--:--:--</span>
+            </div>
+          </div>
+
+          <!-- Statistics Cards -->
+          <section class="flex flex-wrap gap-4 p-4" aria-label="Key metrics">
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-[#204b3d] hover:bg-[#2e6b58] transition-colors cursor-pointer">
+              <p class="text-white text-base font-medium leading-normal">Total Attacks Detected</p>
+              <p id="total-attacks" class="text-white tracking-light text-2xl font-bold leading-tight">Loading...</p>
+              <p id="attacks-growth" class="text-[#0bda49] text-base font-medium leading-normal">--</p>
+            </div>
+            
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-[#204b3d] hover:bg-[#2e6b58] transition-colors cursor-pointer">
+              <p class="text-white text-base font-medium leading-normal">Active Honeypots</p>
+              <p id="active-honeypots" class="text-white tracking-light text-2xl font-bold leading-tight">Loading...</p>
+              <p class="text-[#0bda49] text-base font-medium leading-normal">Online</p>
+            </div>
+            
+            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-[#204b3d] hover:bg-[#2e6b58] transition-colors cursor-pointer">
+              <p class="text-white text-base font-medium leading-normal">Unique Attacker IPs</p>
+              <p id="unique-ips" class="text-white tracking-light text-2xl font-bold leading-tight">Loading...</p>
+              <p id="ips-growth" class="text-[#0bda49] text-base font-medium leading-normal">--</p>
+            </div>
+          </section>
+
+          <!-- Attack Chart Section -->
+          <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Attack Attempts Over Time</h2>
+          <div class="flex flex-wrap gap-4 px-4 py-6">
+            <div class="flex min-w-72 flex-1 flex-col gap-2">
+              <p class="text-white text-base font-medium leading-normal">Real-time Attack Data</p>
+              <p id="current-attacks" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">Loading...</p>
+              <div class="flex gap-1">
+                <p class="text-[#8dceb9] text-base font-normal leading-normal">From Combined Server</p>
+                <p id="growth-percentage" class="text-[#0bda49] text-base font-medium leading-normal">Live</p>
+              </div>
+              
+              <div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+                <svg width="100%" height="148" viewBox="-3 0 478 150" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" role="img" aria-label="Attack attempts chart">
+                  <path
+                    d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z"
+                    fill="url(#paint0_linear_1131_5935)"
+                  />
+                  <path
+                    d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25"
+                    stroke="#8dceb9"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <defs>
+                    <linearGradient id="paint0_linear_1131_5935" x1="236" y1="1" x2="236" y2="149" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#204b3d"/>
+                      <stop offset="1" stop-color="#204b3d" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="flex justify-around">
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">1</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">5</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">10</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">15</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">20</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">25</p>
+                  <p class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">30</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Attack Logs Table -->
+          <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Recent Attack Logs</h2>
+          <div class="px-4 py-3">
+            <div class="flex overflow-hidden rounded-xl border border-[#2e6b58] bg-[#0f241d]">
+              <table class="flex-1" role="table" aria-label="Recent attack logs">
+                <thead>
+                  <tr class="bg-[#17362c]">
+                    <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Timestamp</th>
+                    <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Attacker IP</th>
+                    <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Target Device</th>
+                    <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Attack Type</th>
+                    <th scope="col" class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="attack-logs">
+                  <tr class="border-t border-t-[#2e6b58]">
+                    <td colspan="5" class="h-[72px] px-4 py-2 text-center text-[#8dceb9] text-sm font-normal leading-normal">
+                      Loading real attack data from combined server...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Actions Section -->
+          <section class="px-4 py-6">
+            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Quick Actions</h2>
+            <div class="flex flex-wrap gap-4">
+              <a href="alerts.html" class="flex-1 min-w-[200px] bg-[#204b3d] hover:bg-[#2e6b58] rounded-xl p-4 transition-colors">
+                <h3 class="text-white font-medium mb-2">View Live Attacks</h3>
+                <p class="text-[#8dceb9] text-sm">Monitor real-time attack attempts</p>
+              </a>
+              <a href="devices.html" class="flex-1 min-w-[200px] bg-[#204b3d] hover:bg-[#2e6b58] rounded-xl p-4 transition-colors">
+                <h3 class="text-white font-medium mb-2">Check Device Status</h3>
+                <p class="text-[#8dceb9] text-sm">Review honeypot health & activity</p>
+              </a>
+              <a href="reports.html" class="flex-1 min-w-[200px] bg-[#204b3d] hover:bg-[#2e6b58] rounded-xl p-4 transition-colors">
+                <h3 class="text-white font-medium mb-2">Generate Reports</h3>
+                <p class="text-[#8dceb9] text-sm">Analyze attack patterns & trends</p>
+              </a>
+            </div>
+          </section>
+
+          <!-- System Status Section -->
+          <section class="px-4 py-6">
+            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">System Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="bg-[#1a2e26] rounded-lg p-4 border border-[#2e6b58]">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-[#8dceb9] text-sm font-medium">Combined Server</h3>
+                  <div id="backend-status-dot" class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                </div>
+                <p id="backend-status-text" class="text-white text-lg font-bold">Connecting</p>
+              </div>
+              
+              <div class="bg-[#1a2e26] rounded-lg p-4 border border-[#2e6b58]">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-[#8dceb9] text-sm font-medium">WebSocket</h3>
+                  <div id="websocket-status-dot" class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                </div>
+                <p id="websocket-status-text" class="text-white text-lg font-bold">Connecting</p>
+              </div>
+              
+              <div class="bg-[#1a2e26] rounded-lg p-4 border border-[#2e6b58]">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-[#8dceb9] text-sm font-medium">Attack Simulation</h3>
+                  <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+                <p class="text-white text-lg font-bold">Active</p>
+              </div>
+              
+              <div class="bg-[#1a2e26] rounded-lg p-4 border border-[#2e6b58]">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-[#8dceb9] text-sm font-medium">Threat Level</h3>
+                  <div id="threat-level-dot" class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                </div>
+                <p id="threat-level-text" class="text-white text-lg font-bold">Medium</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- JavaScript with Combined Server Support -->
+  <script>
+    // ═══════════════════════════════════════════════════════════════════
+    // CONFIGURATION - Single Server Setup
+    // ═══════════════════════════════════════════════════════════════════
+    
+    // Single server configuration - both API and WebSocket on same URL
+    const SERVER_URL = 'http://localhost:5000';  // ✅ Single URL for everything
+    const API_BASE = `${SERVER_URL}/api`;
+    
+    // Global variables
+    let socket = null;
+    let isWebSocketConnected = false;
+    let isApiConnected = false;
+    let previousStats = { totalAttacks: 0, uniqueIps: 0 };
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
+    // ═══════════════════════════════════════════════════════════════════
+    // WEBSOCKET MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Initialize Socket.IO connection to combined server
+    function initializeWebSocket() {
+      try {
+        console.log('🔗 Connecting to combined server WebSocket...');
+        console.log('📡 WebSocket URL:', SERVER_URL);
+        
+        socket = io(SERVER_URL, {
+          transports: ['websocket', 'polling'],
+          upgrade: true,
+          reconnection: true,
+          reconnectionAttempts: maxReconnectAttempts,
+          reconnectionDelay: 2000
+        });
+        
+        // WebSocket event handlers
+        socket.on('connect', function() {
+          console.log('✅ WebSocket connected to combined server!');
+          isWebSocketConnected = true;
+          reconnectAttempts = 0;
+          updateWebSocketStatus(true);
+          
+          // Show connection success notification
+          showNotification('🔗 Real-time connection established!', 'success');
+          
+          // Request latest attacks on connection
+          socket.emit('request_latest_attacks');
+        });
+
+        socket.on('disconnect', function(reason) {
+          console.log('❌ WebSocket disconnected:', reason);
+          isWebSocketConnected = false;
+          updateWebSocketStatus(false);
+          
+          // Show disconnection notification
+          showNotification('🔗 Real-time connection lost. Retrying...', 'warning');
+        });
+
+        socket.on('new_attack', function(attack) {
+          console.log('🚨 Real-time attack received via WebSocket:', attack);
+          
+          // Show real-time attack notification
+          showAttackNotification(attack);
+          
+          // Update attack logs table with new attack
+          addNewAttackToTable(attack);
+          
+          // Refresh dashboard statistics
+          fetchRealData();
+        });
+
+        socket.on('status', function(data) {
+          console.log('📡 WebSocket status message:', data.message);
+          if (data.server_time) {
+            console.log('🕐 Server time:', data.server_time);
+          }
+        });
+
+        socket.on('latest_attacks', function(attacks) {
+          console.log('📥 Received latest attacks from WebSocket:', attacks.length);
+          if (attacks.length > 0) {
+            updateAttackLogsTable(attacks);
+          }
+        });
+
+        socket.on('connect_error', function(error) {
+          console.error('❌ WebSocket connection error:', error);
+          reconnectAttempts++;
+          updateWebSocketStatus(false);
+          
+          if (reconnectAttempts >= maxReconnectAttempts) {
+            showNotification('❌ WebSocket connection failed after multiple attempts', 'error');
+          }
+        });
+
+        socket.on('reconnect', function(attemptNumber) {
+          console.log('🔄 WebSocket reconnected after', attemptNumber, 'attempts');
+          showNotification('✅ WebSocket reconnected!', 'success');
+        });
+
+      } catch (error) {
+        console.error('❌ WebSocket initialization failed:', error);
+        updateWebSocketStatus(false);
+      }
+    }
+
+    // Update WebSocket status indicators
+    function updateWebSocketStatus(connected) {
+      const wsDot = document.getElementById('ws-status-dot');
+      const wsText = document.getElementById('ws-status-text');
+      const wsStatusDot = document.getElementById('websocket-status-dot');
+      const wsStatusText = document.getElementById('websocket-status-text');
+      
+      if (connected) {
+        wsDot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
+        wsText.textContent = 'WS: Live';
+        wsStatusDot.className = 'w-2 h-2 bg-green-400 rounded-full';
+        wsStatusText.textContent = 'Connected';
+      } else {
+        wsDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+        wsText.textContent = 'WS: Offline';
+        wsStatusDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+        wsStatusText.textContent = 'Disconnected';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // API MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Update API connection status
+    function updateConnectionStatus(connected) {
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const backendDot = document.getElementById('backend-status-dot');
+      const backendText = document.getElementById('backend-status-text');
+      
+      isApiConnected = connected;
+      
+      if (connected) {
+        statusDot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
+        statusText.textContent = 'API: Online';
+        backendDot.className = 'w-2 h-2 bg-green-400 rounded-full';
+        backendText.textContent = 'Online';
+      } else {
+        statusDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+        statusText.textContent = 'API: Offline';
+        backendDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+        backendText.textContent = 'Offline';
+      }
+    }
+
+    // Fetch real data from combined server API
+    async function fetchRealData() {
+      try {
+        console.log('🔄 Fetching data from combined server API...');
+        
+        // Get statistics from combined server
+        const statsResponse = await fetch(`${API_BASE}/stats`);
+        if (!statsResponse.ok) {
+          throw new Error(`HTTP ${statsResponse.status}: ${statsResponse.statusText}`);
+        }
+        
+        const stats = await statsResponse.json();
+        console.log('📊 Stats received from combined server:', stats);
+        
+        // Update dashboard with real data
+        document.getElementById('total-attacks').textContent = stats.total_attacks.toLocaleString();
+        document.getElementById('active-honeypots').textContent = stats.active_devices;
+        document.getElementById('unique-ips').textContent = stats.unique_ips;
+        document.getElementById('current-attacks').textContent = stats.total_attacks.toLocaleString();
+        
+        // Calculate growth percentages
+        const attackGrowth = previousStats.totalAttacks > 0 ? 
+          Math.round(((stats.total_attacks - previousStats.totalAttacks) / previousStats.totalAttacks) * 100) : 0;
+        const ipGrowth = previousStats.uniqueIps > 0 ? 
+          Math.round(((stats.unique_ips - previousStats.uniqueIps) / previousStats.uniqueIps) * 100) : 0;
+        
+        document.getElementById('attacks-growth').textContent = `+${Math.abs(attackGrowth)}%`;
+        document.getElementById('ips-growth').textContent = `+${Math.abs(ipGrowth)}%`;
+        
+        // Update threat level
+        const threatLevel = stats.threat_level || 'Medium';
+        document.getElementById('threat-level-text').textContent = threatLevel;
+        const threatDot = document.getElementById('threat-level-dot');
+        if (threatLevel === 'High') {
+          threatDot.className = 'w-2 h-2 bg-red-400 rounded-full animate-pulse';
+        } else if (threatLevel === 'Medium') {
+          threatDot.className = 'w-2 h-2 bg-yellow-400 rounded-full';
+        } else {
+          threatDot.className = 'w-2 h-2 bg-green-400 rounded-full';
+        }
+        
+        // Store current stats
+        previousStats = {
+          totalAttacks: stats.total_attacks,
+          uniqueIps: stats.unique_ips
+        };
+        
+        // Get attack logs (only if WebSocket is not providing real-time updates)
+        if (!isWebSocketConnected) {
+          const attacksResponse = await fetch(`${API_BASE}/attacks`);
+          if (attacksResponse.ok) {
+            const attacks = await attacksResponse.json();
+            updateAttackLogsTable(attacks.slice(0, 5));
+          }
+        }
+        
+        // Update device count
+        document.getElementById('device-count').textContent = stats.active_devices;
+        
+        // Update connection status
+        updateConnectionStatus(true);
+        
+        console.log('✅ API data loaded successfully from combined server!');
+        
+      } catch (error) {
+        console.error('❌ API fetch error:', error);
+        updateConnectionStatus(false);
+        
+        // Show error in table if no WebSocket
+        if (!isWebSocketConnected) {
+          document.getElementById('attack-logs').innerHTML = `
+            <tr class="border-t border-t-[#2e6b58]">
+              <td colspan="5" class="h-[72px] px-4 py-2 text-center text-red-400 text-sm font-normal leading-normal">
+                ❌ Combined server connection failed. Make sure server is running on port 5000.
+              </td>
+            </tr>
+          `;
+        }
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // UI UPDATE FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Show notification messages
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-green-600' : 
+                     type === 'warning' ? 'bg-yellow-600' : 
+                     type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+      
+      notification.className = `fixed top-20 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse`;
+      notification.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span>${message}</span>
+          <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 5000);
+    }
+
+    // Show real-time attack notification
+    function showAttackNotification(attack) {
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-20 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+      notification.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🚨</span>
+          <div>
+            <div class="font-bold text-sm">Live Attack Detected!</div>
+            <div class="text-xs">${attack.attack_type} from ${attack.source_ip}</div>
+            <div class="text-xs">Target: ${attack.target_device}</div>
+          </div>
+          <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Update notification counter
+      const notificationCount = document.getElementById('notification-count');
+      if (notificationCount) {
+        const currentCount = parseInt(notificationCount.textContent) || 0;
+        notificationCount.textContent = currentCount + 1;
+      }
+      
+      // Auto-remove after 7 seconds
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 7000);
+    }
+
+    // Add new attack to table (real-time)
+    function addNewAttackToTable(attack) {
+      const tbody = document.getElementById('attack-logs');
+      if (!tbody) return;
+      
+      const timestamp = new Date(attack.timestamp);
+      const formattedTime = timestamp.toLocaleString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      
+      const severityColor = attack.severity === 'High' ? 'bg-red-600' : 
+                           attack.severity === 'Medium' ? 'bg-yellow-600' : 'bg-green-600';
+      
+      const newRow = document.createElement('tr');
+      newRow.className = 'border-t border-t-[#2e6b58] hover:bg-[#1a2e26] transition-colors animate-pulse';
+      newRow.innerHTML = `
+        <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal font-mono">${formattedTime}</td>
+        <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">
+          <div class="flex items-center gap-2">
+            <span>${attack.source_ip}</span>
+            <span class="text-xs bg-[#39564d] px-2 py-1 rounded">${attack.country}</span>
+          </div>
+        </td>
+        <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.target_device}</td>
+        <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.attack_type}</td>
+        <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+          <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${severityColor} text-white text-sm font-medium animate-pulse">
+            ${attack.status}
+          </span>
+        </td>
+      `;
+      
+      // Add to beginning of table
+      tbody.insertBefore(newRow, tbody.firstChild);
+      
+      // Remove animation after 3 seconds
+      setTimeout(() => {
+        newRow.classList.remove('animate-pulse');
+      }, 3000);
+      
+      // Keep only latest 10 rows
+      const rows = tbody.querySelectorAll('tr');
+      if (rows.length > 10) {
+        for (let i = 10; i < rows.length; i++) {
+          tbody.removeChild(rows[i]);
+        }
+      }
+    }
+
+    // Update attack logs table
+    function updateAttackLogsTable(attacks) {
+      const tbody = document.getElementById('attack-logs');
+      if (!tbody || !attacks.length) return;
+      
+      tbody.innerHTML = attacks.map(attack => {
+        const timestamp = new Date(attack.timestamp);
+        const formattedTime = timestamp.toLocaleString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        
+        const severityColor = attack.severity === 'High' ? 'bg-red-600' : 
+                             attack.severity === 'Medium' ? 'bg-yellow-600' : 'bg-green-600';
+        
+        return `
+          <tr class="border-t border-t-[#2e6b58] hover:bg-[#1a2e26] transition-colors">
+            <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal font-mono">${formattedTime}</td>
+            <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">
+              <div class="flex items-center gap-2">
+                <span>${attack.source_ip}</span>
+                <span class="text-xs bg-[#39564d] px-2 py-1 rounded">${attack.country}</span>
+              </div>
+            </td>
+            <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.target_device}</td>
+            <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.attack_type}</td>
+            <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+              <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${severityColor} text-white text-sm font-medium">
+                ${attack.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Update timestamps
+    function updateTimestamps() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
+      
+      document.getElementById('last-updated').textContent = timeString;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // APPLICATION INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 IoT HoneyNet Dashboard initializing...');
+      console.log('🏠 Combined Server URL:', SERVER_URL);
+      console.log('🔗 API Base URL:', API_BASE);
+      
+      // Initialize WebSocket connection to combined server
+      initializeWebSocket();
+      
+      // Initial data load
+      fetchRealData();
+      
+      // Update timestamps
+      updateTimestamps();
+      setInterval(updateTimestamps, 1000);
+      
+      // Fetch API data every 10 seconds (WebSocket handles real-time updates)
+      setInterval(fetchRealData, 10000);
+      
+      // Show welcome message
+      setTimeout(() => {
+        showNotification('🎉 IoT HoneyNet Dashboard loaded - Single server mode!', 'success');
+      }, 1000);
+      
+      console.log('✅ Dashboard fully initialized with combined server!');
+      console.log('📡 Real-time: WebSocket + API polling from single server');
+    });
+  </script>
+</body>
+</html>
