@@ -120,7 +120,7 @@ def enrich_ip(ip):
                 "org": data.get("org", "--"),
                 "asn": data.get("as", "--"),
             }
-    except Exception as e:
+    except (requests.RequestException, ValueError) as e:
         print("GeoIP/API error:", str(e))
     return dict(country="--", city="--", region="--", latitude=None, longitude=None, isp="--", org="--", asn="--")
 
