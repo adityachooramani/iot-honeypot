@@ -301,10 +301,15 @@
 
   <!-- JavaScript with Combined Server Support -->
 <script>
-  // Configuration - Single Server Setup
-  const SERVER_URL = 'https://iot-honeypot-production.herokuapp.com'; // replace with your live backend URL
+  // ═══════════════════════════════════════════════════════════════════
+  // CONFIGURATION - Single Server Setup
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Single server configuration - both API and WebSocket on same URL
+  const SERVER_URL = 'https://iot-honeypot-production-a864.up.railway.app';  // ✅ Single URL for everything
   const API_BASE = `${SERVER_URL}/api`;
 
+  // Global variables
   let socket = null;
   let isWebSocketConnected = false;
   let isApiConnected = false;
@@ -312,286 +317,425 @@
   let reconnectAttempts = 0;
   const maxReconnectAttempts = 5;
 
-  function animateUpdate(el) {
-    if (!el) return;
-    el.classList.add('animate-pulse');
-    setTimeout(() => el.classList.remove('animate-pulse'), 1000);
-  }
+  // ═══════════════════════════════════════════════════════════════════
+  // WEBSOCKET MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════════
 
-  // WebSocket initialization with proper error handling
+  // Initialize Socket.IO connection to combined server
   function initializeWebSocket() {
     try {
-      console.log('🔗 Connecting websocket to:', SERVER_URL);
+      console.log('🔗 Connecting to combined server WebSocket...');
+      console.log('📡 WebSocket URL:', SERVER_URL);
+
       socket = io(SERVER_URL, {
-        transports: ['websocket'],
-        secure: true,
+        transports: ['websocket'],        // Only WebSocket transport for reliability
+        secure: true,                    // Force secure connection (WSS)
         reconnection: true,
         reconnectionAttempts: maxReconnectAttempts,
-        reconnectionDelay: 2000,
+        reconnectionDelay: 2000
       });
 
-      socket.on('connect', () => {
-        console.log('✅ Websocket connected');
+      // WebSocket event handlers
+      socket.on('connect', function() {
+        console.log('✅ WebSocket connected to combined server!');
         isWebSocketConnected = true;
         reconnectAttempts = 0;
         updateWebSocketStatus(true);
-        showNotification('Connected to live feed', 'success');
+
+        // Show connection success notification
+        showNotification('🔗 Real-time connection established!', 'success');
+
+        // Request latest attacks on connection
         socket.emit('request_latest_attacks');
       });
 
-      socket.on('disconnect', (reason) => {
-        console.warn('⚠️ Websocket disconnected:', reason);
+      socket.on('disconnect', function(reason) {
+        console.log('❌ WebSocket disconnected:', reason);
         isWebSocketConnected = false;
         updateWebSocketStatus(false);
-        showNotification('WebSocket disconnected. Reconnecting...', 'warning');
+
+        // Show disconnection notification
+        showNotification('🔗 Real-time connection lost. Retrying...', 'warning');
       });
 
-      socket.on('connect_error', (error) => {
-        console.error('🚨 Websocket connection error:', error);
+      socket.on('new_attack', function(attack) {
+        console.log('🚨 Real-time attack received via WebSocket:', attack);
+
+        // Show real-time attack notification
+        showAttackNotification(attack);
+
+        // Update attack logs table with new attack
+        addNewAttackToTable(attack);
+
+        // Refresh dashboard statistics
+        fetchRealData();
+      });
+
+      socket.on('status', function(data) {
+        console.log('📡 WebSocket status message:', data.message);
+        if (data.server_time) {
+          console.log('🕐 Server time:', data.server_time);
+        }
+      });
+
+      socket.on('latest_attacks', function(attacks) {
+        console.log('📥 Received latest attacks from WebSocket:', attacks.length);
+        if (attacks.length > 0) {
+          updateAttackLogsTable(attacks);
+        }
+      });
+
+      socket.on('connect_error', function(error) {
+        console.error('❌ WebSocket connection error:', error);
         reconnectAttempts++;
         updateWebSocketStatus(false);
+
         if (reconnectAttempts >= maxReconnectAttempts) {
-          showNotification('WebSocket connection failed after multiple attempts', 'error');
+          showNotification('❌ WebSocket connection failed after multiple attempts', 'error');
         }
       });
 
-      socket.on('reconnect', (attempt) => {
-        console.log(`🔁 Websocket reconnected after attempt #${attempt}`);
-        showNotification('WebSocket reconnected!', 'success');
+      socket.on('reconnect', function(attemptNumber) {
+        console.log('🔄 WebSocket reconnected after', attemptNumber, 'attempts');
+        showNotification('✅ WebSocket reconnected!', 'success');
       });
 
-      socket.on('new_attack', (attack) => {
-        console.log('🚨 New attack received:', attack);
-        showAttackNotification(attack);
-        addNewAttackToTable(attack);
-        fetchDashboardStats();
-      });
-
-      socket.on('latest_attacks', (attacks) => {
-        if (Array.isArray(attacks) && attacks.length > 0) {
-          updateAttackTable(attacks);
-        }
-      });
-    } catch (e) {
-      console.error('❌ Failed to initialize WebSocket:', e);
+    } catch (error) {
+      console.error('❌ WebSocket initialization failed:', error);
       updateWebSocketStatus(false);
     }
   }
 
-  // Update UI status indicators for websocket
+  // Update WebSocket status indicators
   function updateWebSocketStatus(connected) {
-    const dot = document.getElementById('ws-status-dot');
-    const text = document.getElementById('ws-status-text');
-    const dotStatus = document.getElementById('websocket-status-dot');
-    const textStatus = document.getElementById('websocket-status-text');
+    const wsDot = document.getElementById('ws-status-dot');
+    const wsText = document.getElementById('ws-status-text');
+    const wsStatusDot = document.getElementById('websocket-status-dot');
+    const wsStatusText = document.getElementById('websocket-status-text');
+
     if (connected) {
-      if(dot) dot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
-      if(text) text.textContent = 'WS: Live';
-      if(dotStatus) dotStatus.className = 'w-2 h-2 bg-green-400 rounded-full';
-      if(textStatus) textStatus.textContent = 'Connected';
+      wsDot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
+      wsText.textContent = 'WS: Live';
+      wsStatusDot.className = 'w-2 h-2 bg-green-400 rounded-full';
+      wsStatusText.textContent = 'Connected';
     } else {
-      if(dot) dot.className = 'w-2 h-2 bg-red-400 rounded-full';
-      if(text) text.textContent = 'WS: Offline';
-      if(dotStatus) dotStatus.className = 'w-2 h-2 bg-red-400 rounded-full';
-      if(textStatus) textStatus.textContent = 'Disconnected';
+      wsDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+      wsText.textContent = 'WS: Offline';
+      wsStatusDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+      wsStatusText.textContent = 'Disconnected';
     }
   }
 
-  // Update UI status indicators for API
-  function updateApiStatus(connected) {
-    const dot = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    const dotStatus = document.getElementById('backend-status-dot');
-    const textStatus = document.getElementById('backend-status-text');
+  // ═══════════════════════════════════════════════════════════════════
+  // API MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Update API connection status
+  function updateConnectionStatus(connected) {
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const backendDot = document.getElementById('backend-status-dot');
+    const backendText = document.getElementById('backend-status-text');
+
+    isApiConnected = connected;
+
     if (connected) {
-      if(dot) dot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
-      if(text) text.textContent = 'API: Online';
-      if(dotStatus) dotStatus.className = 'w-2 h-2 bg-green-400 rounded-full';
-      if(textStatus) textStatus.textContent = 'Online';
+      statusDot.className = 'w-2 h-2 bg-green-400 rounded-full animate-pulse';
+      statusText.textContent = 'API: Online';
+      backendDot.className = 'w-2 h-2 bg-green-400 rounded-full';
+      backendText.textContent = 'Online';
     } else {
-      if(dot) dot.className = 'w-2 h-2 bg-red-400 rounded-full';
-      if(text) text.textContent = 'API: Offline';
-      if(dotStatus) dotStatus.className = 'w-2 h-2 bg-red-400 rounded-full';
-      if(textStatus) textStatus.textContent = 'Offline';
+      statusDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+      statusText.textContent = 'API: Offline';
+      backendDot.className = 'w-2 h-2 bg-red-400 rounded-full';
+      backendText.textContent = 'Offline';
     }
   }
 
-  // Fetch and update dashboard statistics and key data
-  async function fetchDashboardStats() {
+  // Fetch real data from combined server API
+  async function fetchRealData() {
     try {
-      console.log('⏳ Fetching API stats...');
-      const response = await fetch(`${API_BASE}/stats`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.log('🔄 Fetching data from combined server API...');
 
-      const data = await response.json();
-      console.log('📈 Stats:', data);
-
-      updateElementText('#total-attacks', data.total_attacks);
-      updateElementText('#unique-ips', data.unique_ips);
-      updateElementText('#active-honeypots', data.active_devices || 0);
-      updateElementText('#current-attacks', data.total_attacks);
-      updateElementText('#device-count', data.active_devices || 0);
-
-      // Animate changes if values differ
-      animateChangeIfDiff('#total-attacks', data.total_attacks);
-      animateChangeIfDiff('#unique-ips', data.unique_ips);
-      animateChangeIfDiff('#active-honeypots', data.active_devices || 0);
-      animateChangeIfDiff('#device-count', data.active_devices || 0);
-
-      // Update growth percentages
-      const attackGrowth = previousStats.totalAttacks > 0 ? Math.round(((data.total_attacks - previousStats.totalAttacks) / previousStats.totalAttacks) * 100) : 0;
-      const ipGrowth = previousStats.uniqueIps > 0 ? Math.round(((data.unique_ips - previousStats.uniqueIps) / previousStats.uniqueIps) * 100) : 0;
-
-      updateElementText('#attacks-growth', `+${attackGrowth}%`);
-      updateElementText('#ips-growth', `+${ipGrowth}%`);
-
-      // Update threat level and color
-      const threatLevel = data.threat_level || 'Medium';
-      const threatText = document.getElementById('threat-level-text');
-      if (threatText && threatText.textContent !== threatLevel) {
-        threatText.textContent = threatLevel;
-        animateUpdate(threatText);
+      // Get statistics from combined server
+      const statsResponse = await fetch(`${API_BASE}/stats`);
+      if (!statsResponse.ok) {
+        throw new Error(`HTTP ${statsResponse.status}: ${statsResponse.statusText}`);
       }
+
+      const stats = await statsResponse.json();
+      console.log('📊 Stats received from combined server:', stats);
+
+      // Update dashboard with real data
+      document.getElementById('total-attacks').textContent = stats.total_attacks.toLocaleString();
+      document.getElementById('active-honeypots').textContent = stats.active_devices || 0;
+      document.getElementById('unique-ips').textContent = stats.unique_ips || 0;
+      document.getElementById('current-attacks').textContent = stats.total_attacks.toLocaleString();
+
+      // Calculate growth percentages
+      const attackGrowth = previousStats.totalAttacks > 0 ?
+        Math.round(((stats.total_attacks - previousStats.totalAttacks) / previousStats.totalAttacks) * 100) : 0;
+      const ipGrowth = previousStats.uniqueIps > 0 ?
+        Math.round(((stats.unique_ips - previousStats.uniqueIps) / previousStats.uniqueIps) * 100) : 0;
+
+      document.getElementById('attacks-growth').textContent = `+${Math.abs(attackGrowth)}%`;
+      document.getElementById('ips-growth').textContent = `+${Math.abs(ipGrowth)}%`;
+
+      // Update threat level
+      const threatLevel = stats.threat_level || 'Medium';
+      document.getElementById('threat-level-text').textContent = threatLevel;
       const threatDot = document.getElementById('threat-level-dot');
-      if (threatDot) {
-        let baseClass = 'w-2 h-2 rounded-full';
-        if (threatLevel === 'High') baseClass += ' bg-red-500 animate-pulse';
-        else if (threatLevel === 'Medium') baseClass += ' bg-yellow-500';
-        else baseClass += ' bg-green-500';
-        threatDot.className = baseClass;
+      if (threatLevel === 'High') {
+        threatDot.className = 'w-2 h-2 bg-red-400 rounded-full animate-pulse';
+      } else if (threatLevel === 'Medium') {
+        threatDot.className = 'w-2 h-2 bg-yellow-400 rounded-full';
+      } else {
+        threatDot.className = 'w-2 h-2 bg-green-400 rounded-full';
       }
 
+      // Store current stats
       previousStats = {
-        totalAttacks: data.total_attacks,
-        uniqueIps: data.unique_ips,
+        totalAttacks: stats.total_attacks,
+        uniqueIps: stats.unique_ips
       };
 
-      updateApiStatus(true);
-    } catch (e) {
-      console.error('❌ Error fetching API stats:', e);
-      updateApiStatus(false);
-      // In case of error and disconnected websocket, notify user
+      // Get attack logs (only if WebSocket is not providing real-time updates)
       if (!isWebSocketConnected) {
-        const tbody = document.getElementById('attack-logs');
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-red-400 text-center py-4">API unreachable. Please check your backend server.</td></tr>`;
+        const attacksResponse = await fetch(`${API_BASE}/attacks`);
+        if (attacksResponse.ok) {
+          const attacks = await attacksResponse.json();
+          updateAttackLogsTable(attacks.slice(0, 5));
         }
+      }
+
+      // Update device count
+      document.getElementById('device-count').textContent = stats.active_devices || 0;
+
+      // Update connection status
+      updateConnectionStatus(true);
+
+      console.log('✅ API data loaded successfully from combined server!');
+
+    } catch (error) {
+      console.error('❌ API fetch error:', error);
+      updateConnectionStatus(false);
+
+      // Show error in table if no WebSocket
+      if (!isWebSocketConnected) {
+        document.getElementById('attack-logs').innerHTML = `
+          <tr class="border-t border-t-[#2e6b58]">
+            <td colspan="5" class="h-[72px] px-4 py-2 text-center text-red-400 text-sm font-normal leading-normal">
+              ❌ Combined server connection failed. Make sure server is running on port 5000.
+            </td>
+          </tr>
+        `;
       }
     }
   }
 
-  // Helper to update element text content safely
-  function updateElementText(selector, value) {
-    const el = document.querySelector(selector);
-    if (!el) return;
-    el.textContent = value.toLocaleString ? value.toLocaleString() : value;
+  // ═══════════════════════════════════════════════════════════════════
+  // UI UPDATE FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Show notification messages
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? 'bg-green-600' : 
+                   type === 'warning' ? 'bg-yellow-600' : 
+                   type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+
+    notification.className = `fixed top-20 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse`;
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span>${message}</span>
+        <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 5000);
   }
 
-  // Animate change only if the number is different than current text
-  function animateChangeIfDiff(selector, newValue) {
-    const el = document.querySelector(selector);
-    if (!el) return;
-    const currentValue = Number(el.textContent.replace(/,/g, ''));
-    if (currentValue !== newValue) {
-      animateUpdate(el);
+  // Show real-time attack notification
+  function showAttackNotification(attack) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-20 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🚨</span>
+        <div>
+          <div class="font-bold text-sm">Live Attack Detected!</div>
+          <div class="text-xs">${attack.attack_type} from ${attack.source_ip}</div>
+          <div class="text-xs">Target: ${attack.target_device}</div>
+        </div>
+        <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Update notification counter
+    const notificationCount = document.getElementById('notification-count');
+    if (notificationCount) {
+      const currentCount = parseInt(notificationCount.textContent) || 0;
+      notificationCount.textContent = currentCount + 1;
     }
+
+    // Auto-remove after 7 seconds
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 7000);
   }
 
-  // Add new attack row to attacks table and animate
+  // Add new attack to table (real-time)
   function addNewAttackToTable(attack) {
     const tbody = document.getElementById('attack-logs');
     if (!tbody) return;
 
-    const ts = new Date(attack.timestamp);
-    const formatted = ts.toLocaleString();
+    const timestamp = new Date(attack.timestamp);
+    const formattedTime = timestamp.toLocaleString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
 
-    const severityClass = {
-      High: 'bg-red-600',
-      Medium: 'bg-yellow-600',
-      Low: 'bg-green-600',
-    }[attack.severity] || 'bg-green-600';
+    const severityColor = attack.severity === 'High' ? 'bg-red-600' : 
+                         attack.severity === 'Medium' ? 'bg-yellow-600' : 'bg-green-600';
 
-    const row = document.createElement('tr');
-    row.className = 'border-t border-t-[#2e6b58] hover:bg-[#1a2b23] transition-colors animate-pulse scale-up';
-    row.innerHTML = `
-      <td class="px-4 py-4 font-mono">${formatted}</td>
-      <td class="px-4 py-4">
+    const newRow = document.createElement('tr');
+    newRow.className = 'border-t border-t-[#2e6b58] hover:bg-[#1a2e26] transition-colors animate-pulse';
+    newRow.innerHTML = `
+      <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal font-mono">${formattedTime}</td>
+      <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">
         <div class="flex items-center gap-2">
-          <span>${attack.source_ip || 'Unknown'}</span>
-          <span class="text-xs bg-[#395a44] rounded px-2">${attack.country || '--'}</span>
+          <span>${attack.source_ip}</span>
+          <span class="text-xs bg-[#39564d] px-2 py-1 rounded">${attack.country}</span>
         </div>
       </td>
-      <td class="px-4 py-4">${attack.target_device || 'Unknown'}</td>
-      <td class="px-4 py-4">${attack.attack_type || 'Unknown'}</td>
-      <td class="px-4 py-4">
-        <span class="inline-block px-3 py-1 rounded ${severityClass} text-white">${attack.status || 'detected'}</span>
-      </td>`;
+      <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.target_device}</td>
+      <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.attack_type}</td>
+      <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+        <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${severityColor} text-white text-sm font-medium animate-pulse">
+          ${attack.status}
+        </span>
+      </td>
+    `;
 
-    tbody.insertBefore(row, tbody.firstChild);
+    // Add to beginning of table
+    tbody.insertBefore(newRow, tbody.firstChild);
 
-    // Remove animation classes after animation finishes
+    // Remove animation after 3 seconds
     setTimeout(() => {
-      row.classList.remove('animate-pulse', 'scale-up');
-    }, 1500);
+      newRow.classList.remove('animate-pulse');
+    }, 3000);
 
-    // Limit table rows to last 10
-    while (tbody.children.length > 10) {
-      tbody.removeChild(tbody.lastChild);
+    // Keep only latest 10 rows
+    const rows = tbody.querySelectorAll('tr');
+    if (rows.length > 10) {
+      for (let i = 10; i < rows.length; i++) {
+        tbody.removeChild(rows[i]);
+      }
     }
   }
 
-  // Update full attack table (used when loading initial data)
-  function updateAttackTable(attacks) {
+  // Update attack logs table
+  function updateAttackLogsTable(attacks) {
     const tbody = document.getElementById('attack-logs');
-    if (!tbody) return;
+    if (!tbody || !attacks.length) return;
 
-    tbody.innerHTML = attacks.slice(0,10).map((attack) => {
-      const ts = new Date(attack.timestamp);
-      const formatted = ts.toLocaleString();
-      const severityClass = {
-        High: 'bg-red-600',
-        Medium: 'bg-yellow-600',
-        Low: 'bg-green-600',
-      }[attack.severity] || 'bg-green-600';
+    tbody.innerHTML = attacks.map(attack => {
+      const timestamp = new Date(attack.timestamp);
+      const formattedTime = timestamp.toLocaleString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      const severityColor = attack.severity === 'High' ? 'bg-red-600' : 
+                           attack.severity === 'Medium' ? 'bg-yellow-600' : 'bg-green-600';
 
       return `
-      <tr class="border-t border-t-[#2e6b58] hover:bg-[#1a2b23]">
-        <td class="px-4 py-4 font-mono">${formatted}</td>
-        <td class="px-4 py-4">
-          <div class="flex items-center gap-2">
-            <span>${attack.source_ip || 'Unknown'}</span>
-            <span class="text-xs bg-[#395a44] rounded px-2">${attack.country || '--'}</span>
-          </div>
-        </td>
-        <td class="px-4 py-4">${attack.target_device || 'Unknown'}</td>
-        <td class="px-4 py-4">${attack.attack_type || 'Unknown'}</td>
-        <td class="px-4 py-4">
-          <span class="inline-block px-3 py-1 rounded ${severityClass} text-white">${attack.status || 'detected'}</span>
-        </td>
-      </tr>`;
+        <tr class="border-t border-t-[#2e6b58] hover:bg-[#1a2e26] transition-colors">
+          <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal font-mono">${formattedTime}</td>
+          <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">
+            <div class="flex items-center gap-2">
+              <span>${attack.source_ip}</span>
+              <span class="text-xs bg-[#39564d] px-2 py-1 rounded">${attack.country}</span>
+            </div>
+          </td>
+          <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.target_device}</td>
+          <td class="h-[72px] px-4 py-2 text-[#8dceb9] text-sm font-normal leading-normal">${attack.attack_type}</td>
+          <td class="h-[72px] px-4 py-2 text-sm font-normal leading-normal">
+            <span class="inline-flex items-center justify-center rounded-xl h-8 px-4 ${severityColor} text-white text-sm font-medium">
+              ${attack.status}
+            </span>
+          </td>
+        </tr>
+      `;
     }).join('');
   }
 
-  // Update the "last updated" timestamp every second
+  // Update timestamps
   function updateTimestamps() {
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
-    const el = document.getElementById('last-updated');
-    if (el) el.textContent = timeStr;
+    const timeString = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+
+    document.getElementById('last-updated').textContent = timeString;
   }
 
-  // On document ready, initialize dashboard functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('Dashboard initializing...');
+  // ═══════════════════════════════════════════════════════════════════
+  // APPLICATION INITIALIZATION
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Initialize dashboard
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 IoT HoneyNet Dashboard initializing...');
+    console.log('🏠 Combined Server URL:', SERVER_URL);
+    console.log('🔗 API Base URL:', API_BASE);
+
+    // Initialize WebSocket connection to combined server
     initializeWebSocket();
-    fetchDashboardStats();
+
+    // Initial data load
+    fetchRealData();
+
+    // Update timestamps
     updateTimestamps();
     setInterval(updateTimestamps, 1000);
-    setInterval(() => { if (!isWebSocketConnected) fetchDashboardStats(); }, 10000);
 
+    // Fetch API data every 10 seconds (WebSocket handles real-time updates)
+    setInterval(() => {
+      if (!isWebSocketConnected) {
+        fetchRealData();
+      }
+    }, 10000);
+
+    // Show welcome message
     setTimeout(() => {
-      showNotification('Dashboard loaded - live mode', 'success');
+      showNotification('🎉 IoT HoneyNet Dashboard loaded - Single server mode!', 'success');
     }, 1000);
+
+    console.log('✅ Dashboard fully initialized with combined server!');
+    console.log('📡 Real-time: WebSocket + API polling from single server');
   });
 </script>
 
