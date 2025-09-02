@@ -25,7 +25,7 @@ else:  # Local dev
     app.config['SECRET_KEY'] = 'development-secret-key'
     DEBUG_MODE = True
 
-# SocketIO setup - eventlet async mode
+# SocketIO setup
 socketio = SocketIO(
     app, cors_allowed_origins="*", async_mode="eventlet",
     logger=DEBUG_MODE, engineio_logger=DEBUG_MODE
@@ -48,6 +48,7 @@ DB_FILE = 'honeypot.db'
 def init_db():
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
     cursor = conn.cursor()
+    # Attacks table, with real enrichment fields
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS attacks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,6 +69,7 @@ def init_db():
             status TEXT
         )
     ''')
+    # Devices table—unchanged
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS devices (
             id TEXT PRIMARY KEY,
@@ -85,6 +87,7 @@ def init_db():
     print("✅ Database initialized successfully")
 
 def setup_sample_devices():
+    # No change—keeps your device registry; you can skip if you want!
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
     cursor = conn.cursor()
     sample_devices = [
@@ -120,11 +123,6 @@ def enrich_ip(ip):
     except (requests.RequestException, ValueError) as e:
         print("GeoIP/API error:", str(e))
     return dict(country="--", city="--", region="--", latitude=None, longitude=None, isp="--", org="--", asn="--")
-
-# Initialize DB and sample devices at module load (ready for gunicorn import)
-init_db()
-setup_sample_devices()
-print("✅ Honeynet initialized. Ready for live, real attack detection.")
 
 # ------------- API & Demo Endpoints -------------
 
@@ -173,6 +171,7 @@ def honeypot_endpoint(path):
         'severity': "High" if request.method in ['POST', 'PUT', 'DELETE'] else "Low",
         'status': 'detected'
     }
+    # Log to DB
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
     cursor = conn.cursor()
     cursor.execute('''
@@ -187,6 +186,7 @@ def honeypot_endpoint(path):
     ))
     conn.commit()
     conn.close()
+
     # WebSocket broadcast
     socketio.emit('new_attack', attack_data)
     return jsonify({'received': True, 'attack_logged': attack_data}), 201
@@ -275,7 +275,15 @@ def handle_request_latest_attacks():
     ]
     emit('latest_attacks', attack_list)
 
-# Entry point
+def initialize_application():
+    print("🚀 Starting IoT HoneyNet Backend Server...")
+    print("🔧 Initializing database...")
+    init_db()
+    setup_sample_devices()
+    print("✅ Honeynet initialized. Ready for live, real attack detection.")
+    print("🌐 Server running and accessible at deployed public URL.")
+
 if __name__ == '__main__':
+    initialize_application()
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, debug=DEBUG_MODE, host='0.0.0.0', port=port)
+    socketio.run(app, debug=False, host='0.0.0.0', port=port)
