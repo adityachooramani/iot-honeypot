@@ -11,6 +11,17 @@
   <title>IoT HoneyNet - Analytics & Reports (Updated)</title>
   <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Socket.IO client (served from backend; preferred to ensure protocol/version match) -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    /* ensure charts remain responsive */
+    canvas { width: 100% !important; height: auto !important; }
+  </style>
 </head>
 <body>
   <div class="relative flex size-full min-h-screen flex-col bg-[#0f241d] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
@@ -96,8 +107,8 @@
                     <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
                     <h3 class="text-[#8dceb9] text-sm font-medium">Threat Level</h3>
                   </div>
-                  <p id="threat-level" class="text-white text-2xl font-bold">High</p>
-                  <p class="text-red-400 text-xs">↑ Increased activity</p>
+                  <p id="threat-level" class="text-white text-2xl font-bold">—</p>
+                  <p id="threat-note" class="text-red-400 text-xs">—</p>
                 </div>
 
                 <div class="text-center">
@@ -105,8 +116,8 @@
                     <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
                     <h3 class="text-[#8dceb9] text-sm font-medium">Blocked Attacks</h3>
                   </div>
-                  <p id="blocked-attacks-total" class="text-white text-2xl font-bold">2,847</p>
-                  <p class="text-green-400 text-xs">↑ 18% this period</p>
+                  <p id="blocked-attacks-total" class="text-white text-2xl font-bold">—</p>
+                  <p class="text-green-400 text-xs">—</p>
                 </div>
 
                 <div class="text-center">
@@ -114,8 +125,8 @@
                     <div class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
                     <h3 class="text-[#8dceb9] text-sm font-medium">Active Threats</h3>
                   </div>
-                  <p id="active-threats-total" class="text-white text-2xl font-bold">34</p>
-                  <p class="text-yellow-400 text-xs">→ Monitoring</p>
+                  <p id="active-threats-total" class="text-white text-2xl font-bold">—</p>
+                  <p class="text-yellow-400 text-xs">—</p>
                 </div>
 
                 <div class="text-center">
@@ -123,8 +134,8 @@
                     <div class="w-3 h-3 bg-blue-400 rounded-full mr-2"></div>
                     <h3 class="text-[#8dceb9] text-sm font-medium">System Health</h3>
                   </div>
-                  <p id="system-health-total" class="text-white text-2xl font-bold">94%</p>
-                  <p class="text-green-400 text-xs">✓ Optimal</p>
+                  <p id="system-health-total" class="text-white text-2xl font-bold">—</p>
+                  <p class="text-green-400 text-xs">—</p>
                 </div>
               </div>
             </div>
@@ -136,34 +147,15 @@
             <article class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-[#2e6b58] p-6 bg-[#1a2e26]">
               <header>
                 <h2 class="text-white text-base font-medium leading-normal">Attack Types Distribution</h2>
-                <p id="attack-types-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">1,847</p>
+                <p id="attack-types-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">—</p>
                 <div class="flex gap-1">
                   <span class="text-[#8dceb9] text-base font-normal leading-normal">Last 7 Days</span>
-                  <span id="attack-types-change" class="text-[#0bda49] text-base font-medium leading-normal">+15%</span>
+                  <span id="attack-types-change" class="text-[#0bda49] text-base font-medium leading-normal">—</span>
                 </div>
               </header>
 
-              <div class="grid min-h-[180px] grid-flow-col gap-6 grid-rows-[1fr_auto] items-end justify-items-center px-3" role="img" aria-label="Bar chart showing attack types distribution">
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 90%;" aria-label="Malware: 90%" data-attack-type="malware"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Malware</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 85%;" aria-label="Phishing: 85%" data-attack-type="phishing"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Phishing</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 70%;" aria-label="DDoS: 70%" data-attack-type="ddos"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">DDoS</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 45%;" aria-label="Brute Force: 45%" data-attack-type="bruteforce"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Brute Force</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 60%;" aria-label="SQL Injection: 60%" data-attack-type="sql"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">SQL Injection</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 25%;" aria-label="XSS: 25%" data-attack-type="xss"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">XSS</span>
-
-                <div class="border-[#8dceb9] bg-[#204b3d] border-t-2 w-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="height: 15%;" aria-label="Ransomware: 15%" data-attack-type="ransomware"></div>
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Ransomware</span>
+              <div class="mt-4">
+                <canvas id="attackTypesCanvas" aria-label="Attack types distribution chart" role="img"></canvas>
               </div>
             </article>
 
@@ -171,48 +163,15 @@
             <article class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-[#2e6b58] p-6 bg-[#1a2e26]">
               <header>
                 <h2 class="text-white text-base font-medium leading-normal">Top Attacker Countries</h2>
-                <p id="attacker-countries-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">43</p>
+                <p id="attacker-countries-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">—</p>
                 <div class="flex gap-1">
                   <span class="text-[#8dceb9] text-base font-normal leading-normal">Countries</span>
-                  <span id="countries-change" class="text-[#fa5838] text-base font-medium leading-normal">-2</span>
+                  <span id="countries-change" class="text-[#fa5838] text-base font-medium leading-normal">—</span>
                 </div>
               </header>
 
-              <div class="grid min-h-[180px] gap-x-4 gap-y-6 grid-cols-[auto_1fr] items-center py-3" role="img" aria-label="Horizontal bar chart showing top attacker countries">
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇨🇳 China</span>
-                <div class="h-full flex-1" aria-label="China: 90%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 90%;" data-country="china"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇷🇺 Russia</span>
-                <div class="h-full flex-1" aria-label="Russia: 75%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 75%;" data-country="russia"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇺🇸 USA</span>
-                <div class="h-full flex-1" aria-label="USA: 60%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 60%;" data-country="usa"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇮🇳 India</span>
-                <div class="h-full flex-1" aria-label="India: 45%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 45%;" data-country="india"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇧🇷 Brazil</span>
-                <div class="h-full flex-1" aria-label="Brazil: 40%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 40%;" data-country="brazil"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇩🇪 Germany</span>
-                <div class="h-full flex-1" aria-label="Germany: 35%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 35%;" data-country="germany"></div>
-                </div>
-
-                <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">🇬🇧 UK</span>
-                <div class="h-full flex-1" aria-label="UK: 30%">
-                  <div class="border-[#8dceb9] bg-[#204b3d] border-r-2 h-full hover:bg-[#2e6b58] transition-colors cursor-pointer" style="width: 30%;" data-country="uk"></div>
-                </div>
+              <div class="mt-4">
+                <canvas id="countriesCanvas" aria-label="Top attacker countries chart" role="img"></canvas>
               </div>
             </article>
 
@@ -220,39 +179,15 @@
             <article class="flex min-w-72 flex-1 flex-col gap-2 rounded-xl border border-[#2e6b58] p-6 bg-[#1a2e26]">
               <header>
                 <h2 class="text-white text-base font-medium leading-normal">Weekly Attack Growth</h2>
-                <p id="weekly-growth-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">+23%</p>
+                <p id="weekly-growth-total" class="text-white tracking-light text-[32px] font-bold leading-tight truncate">—</p>
                 <div class="flex gap-1">
-                  <span class="text-[#8dceb9] text-base font-normal leading-normal">Last 4 Weeks</span>
-                  <span id="growth-trend" class="text-[#0bda49] text-base font-medium leading-normal">+3%</span>
+                  <span class="text-[#8dceb9] text-base font-normal leading-normal">Last 7 Days</span>
+                  <span id="growth-trend" class="text-[#0bda49] text-base font-medium leading-normal">—</span>
                 </div>
               </header>
 
-              <div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
-                <svg width="100%" height="148" viewBox="-3 0 478 150" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" role="img" aria-label="Line chart showing weekly attack growth trend">
-                  <path
-                    d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z"
-                    fill="url(#paint0_linear_reports)"
-                  />
-                  <path
-                    d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25"
-                    stroke="#8dceb9"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                  />
-                  <defs>
-                    <linearGradient id="paint0_linear_reports" x1="236" y1="1" x2="236" y2="149" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#204b3d"/>
-                      <stop offset="1" stop-color="#204b3d" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                <div class="flex justify-around">
-                  <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 1</span>
-                  <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 2</span>
-                  <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 3</span>
-                  <span class="text-[#8dceb9] text-[13px] font-bold leading-normal tracking-[0.015em]">Week 4</span>
-                </div>
+              <div class="mt-4">
+                <canvas id="weeklyCanvas" aria-label="Weekly attack growth chart" role="img"></canvas>
               </div>
             </article>
           </section>
@@ -262,13 +197,15 @@
             <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Detailed Attack Analysis</h2>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Most Targeted Devices -->
+              <!-- Most Targeted Devices (static summary preserved) -->
               <div class="bg-[#1a2e26] rounded-xl border border-[#2e6b58] p-6">
                 <h3 class="text-white text-lg font-semibold mb-4">Most Targeted Devices</h3>
                 <div class="space-y-4">
                   <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">📹</div>
+                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">
+                        📹
+                      </div>
                       <span class="text-white">Security Camera</span>
                     </div>
                     <div class="text-right">
@@ -279,7 +216,9 @@
 
                   <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">📡</div>
+                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">
+                        📡
+                      </div>
                       <span class="text-white">WiFi Router</span>
                     </div>
                     <div class="text-right">
@@ -290,7 +229,9 @@
 
                   <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">🔒</div>
+                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">
+                        🔒
+                      </div>
                       <span class="text-white">Smart Lock</span>
                     </div>
                     <div class="text-right">
@@ -301,7 +242,9 @@
 
                   <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">🌡️</div>
+                      <div class="w-8 h-8 bg-[#204b3d] rounded-lg flex items-center justify-center">
+                        🌡️
+                      </div>
                       <span class="text-white">Smart Thermostat</span>
                     </div>
                     <div class="text-right">
@@ -312,45 +255,11 @@
                 </div>
               </div>
 
-              <!-- Attack Timeline -->
+              <!-- Attack Timeline (dynamic) -->
               <div class="bg-[#1a2e26] rounded-xl border border-[#2e6b58] p-6">
-                <h3 class="text-white text-lg font-semibold mb-4">Attack Timeline (24h)</h3>
-                <div class="space-y-3">
-                  <div class="flex items-center gap-3 p-3 bg-[#204b3d] rounded-lg">
-                    <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-white text-sm font-medium">DDoS Attack</div>
-                      <div class="text-[#8dceb9] text-xs">Camera #1 - 192.168.1.101</div>
-                    </div>
-                    <div class="text-[#8dceb9] text-xs">2 min ago</div>
-                  </div>
-
-                  <div class="flex items-center gap-3 p-3 bg-[#204b3d] rounded-lg">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-white text-sm font-medium">Brute Force</div>
-                      <div class="text-[#8dceb9] text-xs">Smart Lock - 192.168.1.104</div>
-                    </div>
-                    <div class="text-[#8dceb9] text-xs">15 min ago</div>
-                  </div>
-
-                  <div class="flex items-center gap-3 p-3 bg-[#204b3d] rounded-lg">
-                    <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-white text-sm font-medium">Malware Injection</div>
-                      <div class="text-[#8dceb9] text-xs">Router - 192.168.1.1</div>
-                    </div>
-                    <div class="text-[#8dceb9] text-xs">1 hour ago</div>
-                  </div>
-
-                  <div class="flex items-center gap-3 p-3 bg-[#204b3d] rounded-lg">
-                    <div class="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-white text-sm font-medium">SQL Injection</div>
-                      <div class="text-[#8dceb9] text-xs">Camera #2 - 192.168.1.105</div>
-                    </div>
-                    <div class="text-[#8dceb9] text-xs">3 hours ago</div>
-                  </div>
+                <h3 class="text-white text-lg font-semibold mb-4">Attack Timeline (Latest)</h3>
+                <div id="attack-timeline" class="space-y-3">
+                  <!-- rows injected by JS -->
                 </div>
               </div>
             </div>
@@ -395,173 +304,262 @@
 
   <!-- JavaScript -->
   <script>
-    // Utility to escape HTML - prevents injection when inserting untrusted text into innerHTML
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>\"'`=\/]/g, function (s) {
-        return ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;',
-          '/': '&#x2F;',
-          '`': '&#x60;',
-          '=': '&#x3D;'
-        })[s];
+    // Small HTML escape utility to avoid injecting untrusted text into innerHTML
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"'`=\/]/g, function (c) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[c]);
       });
     }
 
+    // Convert ISO timestamp -> short relative label (UTC-aware)
+    function timeAgo(iso) {
+      if (!iso) return '--';
+      const t = Date.parse(iso);
+      if (isNaN(t)) return iso;
+      const diff = Date.now() - t;
+      const sec = Math.floor(diff / 1000);
+      if (sec < 60) return sec + 's ago';
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min + 'm ago';
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr + 'h ago';
+      const days = Math.floor(hr / 24);
+      return days + 'd ago';
+    }
+
+    // small toast helper
+    function flashToast(text, isError=false) {
+      const el = document.createElement('div');
+      el.className = `fixed right-4 top-4 px-4 py-2 rounded shadow ${isError ? 'bg-red-600' : 'bg-green-600'} z-50`;
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Analytics & Reports Page Loaded (updated)');
+      // Chart.js instances
+      let attackTypesChart = null;
+      let countriesChart = null;
+      let weeklyChart = null;
 
-      // Update report timestamp
+      // caches
+      let attacksCache = [];
+
+      // timestamp widget
       function updateReportTimestamp() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
+        document.getElementById('report-timestamp').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+      }
+      updateReportTimestamp();
+      setInterval(updateReportTimestamp, 30000);
+
+      // fetch /api/attacks and populate UI
+      async function fetchAndRender() {
+        try {
+          const res = await fetch('/api/attacks');
+          if (!res.ok) throw new Error('/api/attacks returned ' + res.status);
+          const data = await res.json();
+          // attacks returned in newest-first order by backend; keep that
+          attacksCache = data;
+          renderTimeline(data);
+          updateSummaryAndCharts(data);
+        } catch (err) {
+          console.error('fetchAndRender error', err);
+          flashToast('Failed to load attacks from API (check server)', true);
+        }
+      }
+
+      // render timeline list
+      function renderTimeline(list) {
+        const container = document.getElementById('attack-timeline');
+        container.innerHTML = '';
+        list.slice(0, 50).forEach(item => {
+          const country = item.country || '--';
+          const method = item.method || 'UNKNOWN';
+          const src = escapeHtml(item.source_ip || '--');
+          const path = escapeHtml(item.path || '/');
+          const time = timeAgo(item.timestamp);
+          const severity = escapeHtml(item.severity || '');
+          const row = document.createElement('div');
+          row.className = 'flex items-center gap-3 p-3 bg-[#204b3d] rounded-lg';
+          row.innerHTML = `
+            <div class="w-2 h-2 ${severity === 'High' ? 'bg-red-500' : severity === 'Low' ? 'bg-green-400' : 'bg-yellow-400'} rounded-full flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-white text-sm font-medium">${path}</div>
+              <div class="text-[#8dceb9] text-xs">IP: <span class="font-mono">${src}</span> • ${escapeHtml(country)} • ${escapeHtml(method)}</div>
+            </div>
+            <div class="text-[#8dceb9] text-xs">${time}</div>
+          `;
+          container.appendChild(row);
         });
-        document.getElementById('report-timestamp').textContent = timeString;
       }
 
-      // Simulate data updates (unchanged)
-      function updateAnalyticsData() {
-        const attackTypesTotal = document.getElementById('attack-types-total');
-        if (attackTypesTotal) {
-          let current = parseInt(attackTypesTotal.textContent.replace(/,/g, ''));
-          current += Math.floor(Math.random() * 5);
-          attackTypesTotal.textContent = current.toLocaleString();
-        }
+      // build charts and summary
+      function updateSummaryAndCharts(list) {
+        // summary numbers
+        document.getElementById('blocked-attacks-total').textContent = (list.length || 0).toLocaleString();
+        document.getElementById('active-threats-total').textContent = (list.filter(a => a.severity === 'High').length || 0);
+        document.getElementById('system-health-total').textContent = '—';
 
-        const blockedTotal = document.getElementById('blocked-attacks-total');
-        if (blockedTotal) {
-          let current = parseInt(blockedTotal.textContent.replace(/,/g, ''));
-          current += Math.floor(Math.random() * 10);
-          blockedTotal.textContent = current.toLocaleString();
-        }
+        const tl = list.length > 200 ? 'Critical' : list.length > 50 ? 'High' : list.length > 10 ? 'Medium' : 'Low';
+        document.getElementById('threat-level').textContent = tl;
+        document.getElementById('threat-note').textContent = list.length > 50 ? '↑ Increased activity' : 'Stable';
 
-        const activeThreats = document.getElementById('active-threats-total');
-        if (activeThreats) {
-          let current = parseInt(activeThreats.textContent);
-          current += Math.floor(Math.random() * 3) - 1;
-          activeThreats.textContent = Math.max(0, current);
+        // Weekly growth (last 7 days)
+        const now = new Date();
+        const dayLabels = [];
+        const dayCounts = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+          d.setUTCDate(d.getUTCDate() - i);
+          dayLabels.push(d.toISOString().slice(0, 10));
+          dayCounts.push(0);
         }
+        list.forEach(a => {
+          if (!a.timestamp) return;
+          const key = (new Date(a.timestamp)).toISOString().slice(0,10);
+          const idx = dayLabels.indexOf(key);
+          if (idx !== -1) dayCounts[idx]++;
+        });
 
-        const weeklyGrowth = document.getElementById('weekly-growth-total');
-        if (weeklyGrowth) {
-          const growth = Math.floor(Math.random() * 10) + 15;
-          weeklyGrowth.textContent = `+${growth}%`;
+        // Attack types/methods
+        const typeCounts = {};
+        list.forEach(a => {
+          const t = (a.method || 'UNKNOWN').toUpperCase();
+          typeCounts[t] = (typeCounts[t] || 0) + 1;
+        });
+        const typeLabels = Object.keys(typeCounts).slice(0, 8);
+        const typeData = typeLabels.map(l => typeCounts[l]);
+
+        // Countries
+        const countryCounts = {};
+        list.forEach(a => {
+          const c = (a.country || 'Unknown');
+          countryCounts[c] = (countryCounts[c] || 0) + 1;
+        });
+        // sort by count desc and take top 8
+        const countriesSorted = Object.entries(countryCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+        const countryLabels = countriesSorted.map(x => x[0]);
+        const countryData = countriesSorted.map(x => x[1]);
+
+        // Update weeklyChart
+        const ctxW = document.getElementById('weeklyCanvas').getContext('2d');
+        if (weeklyChart) weeklyChart.destroy();
+        weeklyChart = new Chart(ctxW, {
+          type: 'line',
+          data: { labels: dayLabels, datasets: [{ label: 'Attacks', data: dayCounts, fill: true, tension: 0.25 }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Update attackTypesChart
+        const ctxT = document.getElementById('attackTypesCanvas').getContext('2d');
+        if (attackTypesChart) attackTypesChart.destroy();
+        attackTypesChart = new Chart(ctxT, {
+          type: 'bar',
+          data: { labels: typeLabels, datasets: [{ label: 'Count', data: typeData }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Update countriesChart (horizontal)
+        const ctxC = document.getElementById('countriesCanvas').getContext('2d');
+        if (countriesChart) countriesChart.destroy();
+        countriesChart = new Chart(ctxC, {
+          type: 'bar',
+          data: { labels: countryLabels, datasets: [{ label: 'Count', data: countryData }] },
+          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true } } }
+        });
+
+        // totals
+        document.getElementById('attack-types-total').textContent = (list.length || 0).toLocaleString();
+        document.getElementById('attacker-countries-total').textContent = Object.keys(countryCounts).length || '0';
+        document.getElementById('weekly-growth-total').textContent = ((dayCounts.reduce((a,b)=>a+b,0) || 0) > 0 ? ('+' + Math.round(((dayCounts.reduce((a,b)=>a+b,0) / 7) || 0)) + '%') : '—');
+      }
+
+      // Setup Socket.IO
+      function setupSocket() {
+        try {
+          // io() connects to same origin by default
+          const socket = io();
+
+          socket.on('connect', () => {
+            console.log('Socket.IO connected:', socket.id);
+            socket.emit('request_latest_attacks');
+          });
+
+          socket.on('status', (d) => console.log('WS status:', d));
+
+          socket.on('latest_attacks', (list) => {
+            console.log('latest_attacks', list);
+            attacksCache = list;
+            renderTimeline(list);
+            updateSummaryAndCharts(list);
+          });
+
+          socket.on('new_attack', (attack) => {
+            console.log('new_attack', attack);
+            // prepend to cache and update minimal UI immediately
+            attacksCache.unshift(attack);
+            renderTimeline(attacksCache);
+            updateSummaryAndCharts(attacksCache);
+            flashToast('New attack: ' + (attack.path || attack.method || attack.source_ip || 'unknown'));
+          });
+
+          socket.on('attack_enriched', (attack) => {
+            console.log('attack_enriched', attack);
+            const idx = attacksCache.findIndex(a => Number(a.id) === Number(attack.id));
+            if (idx !== -1) attacksCache[idx] = attack;
+            else attacksCache.unshift(attack);
+            renderTimeline(attacksCache);
+            updateSummaryAndCharts(attacksCache);
+          });
+
+          socket.on('connect_error', (err) => {
+            console.warn('socket connect_error', err);
+            flashToast('Realtime connection issue — check server/proxy', true);
+          });
+        } catch (err) {
+          console.error('setupSocket error', err);
         }
       }
 
-      // Show chart details modal (safe insertion + accessibility)
-      function showChartDetails(title, item, description) {
+      // Chart detail modal (re-usable)
+      function showChartDetails(title, subtitle) {
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        modal.setAttribute('role', 'dialog');
-        modal.setAttribute('aria-modal', 'true');
-        modal.setAttribute('aria-hidden', 'false');
-
-        // Build safe inner HTML using escaped values
-        const safeItem = escapeHtml(item);
-        const safeDesc = escapeHtml(description);
-        const randomTotal = Math.floor(Math.random() * 1000) + 100;
-        const blockedPct = `${Math.floor(Math.random() * 80) + 15}%`;
-
+        modal.setAttribute('role','dialog');
         modal.innerHTML = `
           <div class="bg-[#1b2824] rounded-xl border border-[#39564d] p-6 max-w-md w-full mx-4">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-white text-xl font-bold">${escapeHtml(title)}</h2>
-              <button class="close-modal text-[#9abcb1] hover:text-white text-2xl" aria-label="Close modal">&times;</button>
+              <button class="close-modal text-[#9abcb1] hover:text-white text-2xl">&times;</button>
             </div>
             <div class="text-[#9abcb1]">
-              <h3 class="text-white font-medium mb-2 capitalize">${safeItem}</h3>
-              <p class="text-sm">${safeDesc}</p>
-              <div class="mt-4 p-4 bg-[#204b3d] rounded-lg">
-                <div class="text-sm space-y-2">
-                  <div class="flex justify-between"><span>Total Events:</span><span class="text-white">${randomTotal}</span></div>
-                  <div class="flex justify-between"><span>Blocked:</span><span class="text-green-400">${blockedPct}</span></div>
-                  <div class="flex justify-between"><span>Risk Level:</span><span class="text-red-400">High</span></div>
-                </div>
-              </div>
+              <h3 class="text-white font-medium mb-2">${escapeHtml(subtitle)}</h3>
+              <p class="text-sm">Detailed breakdown (live data)</p>
             </div>
           </div>
         `;
-
         document.body.appendChild(modal);
-
-        // Accessibility & focus handling
-        const closeBtn = modal.querySelector('.close-modal');
-        if (closeBtn) closeBtn.focus();
-
-        // Keydown handler (Escape to close, Tab focus trap)
-        function onKeyDown(e) {
-          if (e.key === 'Escape') {
-            closeModal();
-            return;
-          }
-          if (e.key === 'Tab') {
-            // simple trap: keep focus inside modal
-            const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            if (focusable.length === 0) return;
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-              e.preventDefault();
-              last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-              e.preventDefault();
-              first.focus();
-            }
-          }
-        }
-
-        function closeModal() {
-          if (modal.parentNode) modal.parentNode.removeChild(modal);
-          document.removeEventListener('keydown', onKeyDown);
-        }
-
-        // overlay click or close button
-        modal.addEventListener('click', function(e) {
-          if (e.target === modal || e.target.classList.contains('close-modal')) {
-            closeModal();
-          }
-        });
-
-        document.addEventListener('keydown', onKeyDown);
+        const close = () => { modal.remove(); document.removeEventListener('keydown', onKey); };
+        modal.addEventListener('click', (e) => { if (e.target === modal || e.target.classList.contains('close-modal')) close(); });
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        document.addEventListener('keydown', onKey);
       }
 
-      // Chart interaction handlers
-      document.addEventListener('click', function(e) {
+      // Click handlers for chart-interactive elements (keeps compatibility with your previous data-* triggers)
+      document.addEventListener('click', (e) => {
         if (e.target.dataset.attackType) {
-          const attackType = e.target.dataset.attackType;
-          showChartDetails('Attack Type', attackType, 'Detailed breakdown of ' + attackType + ' attacks');
-        }
-
-        if (e.target.dataset.country) {
-          const country = e.target.dataset.country;
-          showChartDetails('Country Analysis', country, 'Detailed analysis of attacks from ' + country);
+          showChartDetails('Attack Type', e.target.dataset.attackType);
+        } else if (e.target.dataset.country) {
+          showChartDetails('Country Analysis', e.target.dataset.country);
         }
       });
 
-      // Time range filter
+      // Time-range selector (keeps previous behavior, triggers re-fetch)
       document.getElementById('time-range').addEventListener('change', function() {
         const range = this.value;
-        console.log('Time range changed to:', range);
-
-        setTimeout(() => {
-          updateAnalyticsData();
-          updateReportTimestamp();
-
-          const notification = document.createElement('div');
-          notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg z-50';
-          notification.textContent = `Report updated for ${range.replace('d', ' days').replace('h', ' hours')}`;
-          document.body.appendChild(notification);
-
-          setTimeout(() => { document.body.removeChild(notification); }, 3000);
-        }, 500);
+        flashToast(`Report updated for ${range.replace('d',' days').replace('h',' hours')}`);
+        // in future you might pass this value to the API; for now we just refetch and re-render
+        fetchAndRender();
       });
 
       // Export functionality (unchanged)
@@ -578,17 +576,11 @@
           const reportData = {
             generatedAt: new Date().toISOString(),
             summary: {
-              threatLevel: 'High',
+              threatLevel: document.getElementById('threat-level').textContent,
               blockedAttacks: document.getElementById('blocked-attacks-total').textContent,
               activeThreats: document.getElementById('active-threats-total').textContent,
               systemHealth: document.getElementById('system-health-total').textContent
-            },
-            attackTypes: ['Malware', 'Phishing', 'DDoS', 'Brute Force', 'SQL Injection'],
-            recommendations: [
-              'Update firmware on Camera #1',
-              'Review router access logs',
-              'Schedule security audit'
-            ]
+            }
           };
 
           const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
@@ -605,16 +597,17 @@
             btn.innerHTML = originalContent;
             btn.classList.remove('bg-green-600');
             btn.disabled = false;
-          }, 2000);
-        }, 2000);
+          }, 1200);
+        }, 800);
       });
 
-      // Initialize
-      updateReportTimestamp();
-      setInterval(updateReportTimestamp, 30000);
-      setInterval(updateAnalyticsData, 15000);
-
-      console.log('Analytics & Reports Page fully initialized (updated)');
+      // Initialize charts & data
+      fetchAndRender().then(() => {
+        setupSocket();
+      }).catch(() => {
+        // still try to connect sockets even if initial fetch failed
+        setupSocket();
+      });
     });
   </script>
 </body>
