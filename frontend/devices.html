@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
   <link
     rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
-  >
-  <title>IoT HoneyNet - Device Status</title>
-  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+  />
+  <title>IoT HoneyNet - Device Status (Updated)</title>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 </head>
 <body>
   <div class="relative flex size-full min-h-screen flex-col bg-[#101816] dark group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
     <div class="layout-container flex h-full grow flex-col">
-      
       <!-- Header with Navigation -->
-      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#273a34] px-10 py-3">
+      <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#273a34] px-6 sm:px-10 md:px-20 lg:px-28 xl:px-40 py-3">
         <div class="flex items-center gap-4 text-white">
           <div class="size-4" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_6_319)">
-                <path
-                  d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z"
-                  fill="currentColor"
-                />
+                <path d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z" fill="currentColor" />
               </g>
               <defs>
                 <clipPath id="clip0_6_319">
-                  <rect width="48" height="48" fill="white"/>
+                  <rect width="48" height="48" fill="white" />
                 </clipPath>
               </defs>
             </svg>
           </div>
           <h1 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">IoT HoneyNet</h1>
         </div>
-        
+
         <div class="flex flex-1 justify-end gap-8">
           <!-- Main Navigation -->
           <nav class="flex items-center gap-9" aria-label="Main navigation">
@@ -45,21 +41,16 @@
             <a href="devices.html" class="text-white text-sm font-medium leading-normal border-b-2 border-[#0bda49] pb-1 transition-colors" aria-current="page">Device Status</a>
             <a href="reports.html" class="text-white text-sm font-medium leading-normal hover:text-[#0bda49] transition-colors">Analytics</a>
           </nav>
-          
+
           <!-- Profile -->
-          <div
-            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-[#0bda49] transition-all"
-            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAh9xznB4XD6G02zVJVNtzBxCN1XZD8ivGq3pbgC9zMizPGqwQPChufR0hxvoURUwiso79f6VcDIaKTuquUGjgsrlmJ4tV1P-2vDWujRr_2Kxj6eD7NCIYh8EYVHwAVBNWA61nfXDoXfRUjaNGOG7137TPzQCbJFTVp40VvHqzlio8VY3K7Gq5BmfOkXhI4YaiJ2Yb3PFmgQHh6CvOvFmNr0VB8P4BBYrHemzHR8-9mBXNOgQUfVIUg9zk_1O61On6ubxQir-Gwt8E");'
-            role="img"
-            aria-label="User profile picture"
-          />
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 cursor-pointer hover:ring-2 hover:ring-[#0bda49] transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAh9xznB4XD6G02zVJVNtzBxCN1XZD8ivGq3pbgC9zMizPGqwQPChufR0hxvoURUwiso79f6VcDIaKTuquUGjgsrlmJ4tV1P-2vDWujRr_2Kxj6eD7NCIYh8EYVHwAVBNWA61nfXDoXfRUjaNGOG7137TPzQCbJFTVp40VvHqzlio8VY3K7Gq5BmfOkXhI4YaiJ2Yb3PFmgQHh6CvOvFmNr0VB8P4BBYrHemzHR8-9mBXNOgQUfVIUg9zk_1O61On6ubxQir-Gwt8E");' role="img" aria-label="User profile picture"></div>
         </div>
       </header>
-      
+
       <!-- Main Content -->
-      <main class="px-40 flex flex-1 justify-center py-5">
+      <main class="px-6 sm:px-10 md:px-20 lg:px-28 xl:px-40 flex flex-1 justify-center py-5">
         <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-          
+
           <!-- Page Header -->
           <div class="flex flex-wrap justify-between gap-3 p-4">
             <div class="flex items-center gap-4">
@@ -74,7 +65,7 @@
               <span id="health-check-time" class="font-mono text-[#0bda49]">--:--:--</span>
             </div>
           </div>
-          
+
           <!-- Device Overview Stats -->
           <section class="px-4 py-3" aria-label="Device overview statistics">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -90,7 +81,7 @@
                 <p id="total-devices" class="text-white text-2xl font-bold">6</p>
                 <p class="text-green-400 text-xs">+2 this week</p>
               </div>
-              
+
               <div class="bg-[#1a2622] rounded-lg p-4 border border-[#2e6b58]">
                 <div class="flex items-center justify-between mb-2">
                   <h3 class="text-[#8dceb9] text-sm font-medium">Online Devices</h3>
@@ -103,7 +94,7 @@
                 <p id="online-devices" class="text-white text-2xl font-bold">4</p>
                 <p class="text-green-400 text-xs">67% uptime</p>
               </div>
-              
+
               <div class="bg-[#1a2622] rounded-lg p-4 border border-[#2e6b58]">
                 <div class="flex items-center justify-between mb-2">
                   <h3 class="text-[#8dceb9] text-sm font-medium">Under Attack</h3>
@@ -116,7 +107,7 @@
                 <p id="attacked-devices" class="text-white text-2xl font-bold">2</p>
                 <p class="text-red-400 text-xs">High alert</p>
               </div>
-              
+
               <div class="bg-[#1a2622] rounded-lg p-4 border border-[#2e6b58]">
                 <div class="flex items-center justify-between mb-2">
                   <h3 class="text-[#8dceb9] text-sm font-medium">Network Health</h3>
@@ -131,7 +122,7 @@
               </div>
             </div>
           </section>
-          
+
           <!-- Device Filter and Controls -->
           <section class="px-4 py-3">
             <div class="flex justify-between items-center mb-4">
@@ -142,7 +133,6 @@
                   <option value="offline">Offline Only</option>
                   <option value="attacked">Under Attack</option>
                 </select>
-                
                 <select id="type-filter" class="h-8 rounded-xl bg-[#273a34] text-white text-sm font-medium px-4 pr-8 border-0 cursor-pointer focus:ring-2 focus:ring-[#0bda49]">
                   <option value="all">All Types</option>
                   <option value="camera">Cameras</option>
@@ -151,37 +141,33 @@
                   <option value="router">Routers</option>
                 </select>
               </div>
-              
               <div class="flex gap-2">
-                <button id="refresh-devices" class="h-8 px-4 rounded-xl bg-[#0bda49] hover:bg-[#0bc441] text-black text-sm font-medium transition-colors">
-                  🔄 Refresh
-                </button>
-                <button id="add-device" class="h-8 px-4 rounded-xl bg-[#39564d] hover:bg-[#4a6b5f] text-white text-sm font-medium transition-colors">
-                  + Add Device
-                </button>
+                <button id="refresh-devices" class="h-8 px-4 rounded-xl bg-[#0bda49] hover:bg-[#0bc441] text-black text-sm font-medium transition-colors"> 🔄 Refresh </button>
+                <button id="add-device" class="h-8 px-4 rounded-xl bg-[#39564d] hover:bg-[#4a6b5f] text-white text-sm font-medium transition-colors"> + Add Device </button>
               </div>
             </div>
           </section>
-          
+
           <!-- Device Grid -->
           <section class="px-4 py-3" aria-label="Device monitoring grid">
             <div id="device-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <!-- Devices will be populated here by JavaScript -->
             </div>
           </section>
-          
+
           <!-- Device Actions Panel (Hidden by default) -->
-          <div id="device-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+          <div id="device-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-hidden="true">
             <div class="bg-[#1b2824] rounded-xl border border-[#39564d] p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
               <div class="flex justify-between items-center mb-4">
                 <h2 id="modal-title" class="text-white text-xl font-bold">Device Details</h2>
-                <button id="close-device-modal" class="text-[#9abcb1] hover:text-white text-2xl">&times;</button>
+                <button id="close-device-modal" class="text-[#9abcb1] hover:text-white text-2xl" aria-label="Close device details">&times;</button>
               </div>
               <div id="device-modal-content" class="text-[#9abcb1] space-y-4">
                 <!-- Dynamic content will be inserted here -->
               </div>
             </div>
           </div>
+
         </div>
       </main>
     </div>
@@ -189,170 +175,25 @@
 
   <!-- JavaScript -->
   <script>
-    // Device Status Page JavaScript
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Device Status Page Loaded');
-      
-      // Sample device data
+    // Device Status Page JavaScript (improved)
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('Device Status Page Loaded (updated)');
+
+      // Sample device data (same as before)
       const deviceData = [
-        {
-          id: 'cam-001',
-          name: 'Security Camera #1',
-          type: 'camera',
-          status: 'online',
-          attacks: 15,
-          lastSeen: new Date(),
-          ip: '192.168.1.101',
-          location: 'Front Entrance',
-          firmware: '2.1.4',
-          uptime: '7d 14h',
-          image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcK4PLhNmnPrFmWR1gXGdiXeq34ohiwmhbhDL1LCHfwVxJaNmaXKxrhttDLVtXTm1bpadu_DyZ4fJi4MP-5XWbuBGq2UOdIJKyP_elFm8Z973KnmQfZJDA1GmGY5XIhIRhsnhiuQHqg4nQhjC6fo-GTJ6m25c8yDkH2enD4n3hpAqlQ6Rco9CT9jw-_ShkaHBf6CDD58Qe81fn4SAwA5D7qijrTxaV4HXzBlgz4_MhnJ-t3SYG53kMgwVmzzQN0toHn7yKIamV_wQ'
-        },
-        {
-          id: 'therm-001',
-          name: 'Smart Thermostat',
-          type: 'thermostat',
-          status: 'offline',
-          attacks: 0,
-          lastSeen: new Date(Date.now() - 120000),
-          ip: '192.168.1.102',
-          location: 'Living Room',
-          firmware: '1.8.2',
-          uptime: 'Offline',
-          image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKAd8j4zOlWg5KLVHcMclUG3DWTOL13bC4RbPs4b0BtZd1hGT2M5aiyxTf07Mrj_ACcP10BTqjkgaUDqJaH5TOU9jCEeDSEC3Z0eYNPbmsEOX2_49MoObab20TUvukl43E40xwv40phxGUzbvJrMegUFGC1FBCTDvSwHEqLEe2ACPDkhPTLu4gHUCsuvUjNNd2YGfN5gAsCkqQS1v-hyGOXH4STSq4L12Kwt4ddVotIa47ScyCTrhCUtGMxKzsQ4PF-qnslPUQ3mM'
-        },
-        {
-          id: 'plug-001',
-          name: 'Smart Plug #1',
-          type: 'plug',
-          status: 'online',
-          attacks: 3,
-          lastSeen: new Date(),
-          ip: '192.168.1.103',
-          location: 'Kitchen',
-          firmware: '1.2.1',
-          uptime: '2d 8h',
-          image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCFkl_OGI3I_9VZ23k_Qcp_dD2A-XVYOL4PU0yQyTfjPgTWFpjkHFqSB1f9bJvqoxO-Kctq2JhygqbPWvCpxAVyyVp3L3BFqzFrtVwmSMd7MHn-mV6Hdp49BBBYH0gRWy58rxJXSwry7yn05oSbgPoaY_GmTnp0dJVuPtICvgaFPyqmQIIiDker1DKvfsDmzkDJhb4s4rfqwsHV4kYjpLeNcztYvyHWFEU0PcAuR7ZaDzS_1_9JTP-Kci4YkUSSg1ti3C_0EzRN71w'
-        },
-        {
-          id: 'lock-001',
-          name: 'Smart Lock',
-          type: 'lock',
-          status: 'online',
-          attacks: 0,
-          lastSeen: new Date(),
-          ip: '192.168.1.104',
-          location: 'Main Door',
-          firmware: '3.0.1',
-          uptime: '12d 3h'
-        },
-        {
-          id: 'router-001',
-          name: 'WiFi Router',
-          type: 'router',
-          status: 'online',
-          attacks: 23,
-          lastSeen: new Date(),
-          ip: '192.168.1.1',
-          location: 'Server Room',
-          firmware: '4.2.8',
-          uptime: '30d 12h'
-        },
-        {
-          id: 'cam-002',
-          name: 'Security Camera #2',
-          type: 'camera',
-          status: 'offline',
-          attacks: 0,
-          lastSeen: new Date(Date.now() - 300000),
-          ip: '192.168.1.105',
-          location: 'Back Yard',
-          firmware: '2.1.4',
-          uptime: 'Offline'
-        }
+        { id: 'cam-001', name: 'Security Camera #1', type: 'camera', status: 'online', attacks: 15, lastSeen: new Date(), ip: '192.168.1.101', location: 'Front Entrance', firmware: '2.1.4', uptime: '7d 14h', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcK4PLhNmnPrFmWR1gXGdiXeq34ohiwmhbhDL1LCHfwVxJaNmaXKxrhttDLVtXTm1bpadu_DyZ4fJi4MP-5XWbuBGq2UOdIJKyP_elFm8Z973KnmQfZJDA1GmGY5XIhIRhsnhiuQHqg4nQhjC6fo-GTJ6m25c8yDkH2enD4n3hpAqlQ6Rco9CT9jw-_ShkaHBf6CDD58Qe81fn4SAwA5D7qijrTxaV4HXzBlgz4_MhnJ-t3SYG53kMgwVmzzQN0toHn7yKIamV_wQ' },
+        { id: 'therm-001', name: 'Smart Thermostat', type: 'thermostat', status: 'offline', attacks: 0, lastSeen: new Date(Date.now() - 120000), ip: '192.168.1.102', location: 'Living Room', firmware: '1.8.2', uptime: 'Offline', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKAd8j4zOlWg5KLVHcMclUG3DWTOL13bC4RbPs4b0BtZd1hGT2M5aiyxTf07Mrj_ACcP10BTqjkgaUDqJaH5TOU9jCEeDSEC3Z0eYNPbmsEOX2_49MoObab20TUvukl43E40xwv40phxGUzbvJrMegUFGC1FBCTDvSwHEqLEe2ACPDkhPTLu4gHUCsuvUjNNd2YGfN5gAsCkqQS1v-hyGOXH4STSq4L12Kwt4ddVotIa47ScyCTrhCUtGMxKzsQ4PF-qnslPUQ3mM' },
+        { id: 'plug-001', name: 'Smart Plug #1', type: 'plug', status: 'online', attacks: 3, lastSeen: new Date(), ip: '192.168.1.103', location: 'Kitchen', firmware: '1.2.1', uptime: '2d 8h', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCFkl_OGI3I_9VZ23k_Qcp_dD2A-XVYOL4PU0yQyTfjPgTWFpjkHFqSB1f9bJvqoxO-Kctq2JhygqbPWvCpxAVyyVp3L3BFqzFrtVwmSMd7MHn-mV6Hdp49BBBYH0gRWy58rxJXSwry7yn05oSbgPoaY_GmTnp0dJVuPtICvgaFPyqmQIIiDker1DKvfsDmzkDJhb4s4rfqwsHV4kYjpLeNcztYvyHWFEU0PcAuR7ZaDzS_1_9JTP-Kci4YkUSSg1ti3C_0EzRN71w' },
+        { id: 'lock-001', name: 'Smart Lock', type: 'lock', status: 'online', attacks: 0, lastSeen: new Date(), ip: '192.168.1.104', location: 'Main Door', firmware: '3.0.1', uptime: '12d 3h' },
+        { id: 'router-001', name: 'WiFi Router', type: 'router', status: 'online', attacks: 23, lastSeen: new Date(), ip: '192.168.1.1', location: 'Server Room', firmware: '4.2.8', uptime: '30d 12h' },
+        { id: 'cam-002', name: 'Security Camera #2', type: 'camera', status: 'offline', attacks: 0, lastSeen: new Date(Date.now() - 300000), ip: '192.168.1.105', location: 'Back Yard', firmware: '2.1.4', uptime: 'Offline' }
       ];
-      
-      // Create device card HTML
-      function createDeviceCard(device) {
-        const statusColors = {
-          online: { bg: 'bg-green-400', text: 'text-green-400' },
-          offline: { bg: 'bg-gray-400', text: 'text-gray-400' },
-          attacked: { bg: 'bg-red-400', text: 'text-red-400' }
-        };
-        
-        const attackStatus = device.attacks > 0 ? 'attacked' : device.status;
-        const statusColor = statusColors[attackStatus];
-        const attackColor = device.attacks > 10 ? 'text-red-400' : device.attacks > 0 ? 'text-yellow-400' : 'text-green-400';
-        
-        const deviceIcon = getDeviceIcon(device.type);
-        const deviceImage = device.image || null;
-        
-        return `
-          <article class="device-card bg-[#1a2622] rounded-xl border border-[#2e6b58] p-4 hover:bg-[#1f2d27] transition-all cursor-pointer" 
-                   data-device-id="${device.id}" data-device='${JSON.stringify(device)}'>
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center gap-3">
-                <div class="w-3 h-3 ${statusColor.bg} rounded-full ${device.status === 'online' ? 'animate-pulse' : ''}" 
-                     aria-label="${device.status} status"></div>
-                <div>
-                  <h3 class="text-white font-medium text-base">${device.name}</h3>
-                  <p class="text-[#8dceb9] text-sm capitalize">${device.type}</p>
-                </div>
-              </div>
-              <button class="device-menu text-[#8dceb9] hover:text-white text-lg">⋮</button>
-            </div>
-            
-            ${deviceImage ? `
-              <div class="w-full h-32 bg-center bg-no-repeat bg-cover rounded-lg mb-4" 
-                   style="background-image: url('${deviceImage}')" 
-                   role="img" aria-label="${device.name} image">
-              </div>
-            ` : `
-              <div class="w-full h-32 bg-[#273a34] rounded-lg mb-4 flex items-center justify-center">
-                ${deviceIcon}
-              </div>
-            `}
-            
-            <div class="space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-[#8dceb9] text-sm">Status:</span>
-                <span class="${statusColor.text} text-sm font-medium capitalize">${device.status}</span>
-              </div>
-              
-              <div class="flex justify-between items-center">
-                <span class="text-[#8dceb9] text-sm">Attacks:</span>
-                <span class="${attackColor} text-sm font-bold">${device.attacks}</span>
-              </div>
-              
-              <div class="flex justify-between items-center">
-                <span class="text-[#8dceb9] text-sm">Location:</span>
-                <span class="text-white text-sm">${device.location}</span>
-              </div>
-              
-              <div class="flex justify-between items-center">
-                <span class="text-[#8dceb9] text-sm">Uptime:</span>
-                <span class="text-white text-sm">${device.uptime}</span>
-              </div>
-              
-              <div class="flex justify-between items-center">
-                <span class="text-[#8dceb9] text-sm">IP Address:</span>
-                <span class="text-[#0bda49] text-sm font-mono">${device.ip}</span>
-              </div>
-            </div>
-            
-            <div class="mt-4 pt-4 border-t border-[#39564d] flex gap-2">
-              <button class="flex-1 px-3 py-2 bg-[#39564d] hover:bg-[#4a6b5f] text-white text-xs rounded-lg transition-colors">
-                Configure
-              </button>
-              <button class="flex-1 px-3 py-2 bg-[#0bda49] hover:bg-[#0bc441] text-black text-xs rounded-lg transition-colors">
-                Monitor
-              </button>
-            </div>
-          </article>
-        `;
-      }
-      
-      // Get device icon based on type
+
+      // deviceMap to avoid embedding JSON into DOM
+      const deviceMap = {};
+      deviceData.forEach(d => deviceMap[d.id] = d);
+
+      // Utility: get device icon
       function getDeviceIcon(type) {
         const icons = {
           camera: '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="text-white opacity-60" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.72,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.65-3.56L100.28,48h55.44l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg>',
@@ -363,194 +204,265 @@
         };
         return icons[type] || icons.camera;
       }
-      
-      // Render device grid
+
+      // Create device card HTML (no JSON embedded)
+      function createDeviceCard(device) {
+        const statusColors = {
+          online: { bg: 'bg-green-400', text: 'text-green-400' },
+          offline: { bg: 'bg-gray-400', text: 'text-gray-400' },
+          attacked: { bg: 'bg-red-400', text: 'text-red-400' }
+        };
+        const attackStatus = device.attacks > 0 ? 'attacked' : device.status;
+        const statusColor = statusColors[attackStatus] || statusColors.offline;
+        const attackColor = device.attacks > 10 ? 'text-red-400' : device.attacks > 0 ? 'text-yellow-400' : 'text-green-400';
+        const deviceIcon = getDeviceIcon(device.type);
+        const deviceImage = device.image || null;
+
+        // Safely build markup (avoid inserting raw JSON)
+        return `
+          <article class="device-card bg-[#1a2622] rounded-xl border border-[#2e6b58] p-4 hover:bg-[#1f2d27] transition-all cursor-pointer" data-device-id="${device.id}">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 ${statusColor.bg} rounded-full ${device.status === 'online' ? 'animate-pulse' : ''}" aria-label="${device.status} status"></div>
+                <div>
+                  <h3 class="text-white font-medium text-base">${device.name}</h3>
+                  <p class="text-[#8dceb9] text-sm capitalize">${device.type}</p>
+                </div>
+              </div>
+              <button class="device-menu text-[#8dceb9] hover:text-white text-lg" aria-label="Device menu">⋮</button>
+            </div>
+
+            ${deviceImage ? `
+              <div class="w-full h-32 bg-center bg-no-repeat bg-cover rounded-lg mb-4" style="background-image: url('${deviceImage.replace(/'/g, "%27")}')" role="img" aria-label="${device.name} image"></div>
+            ` : `
+              <div class="w-full h-32 bg-[#273a34] rounded-lg mb-4 flex items-center justify-center">${deviceIcon}</div>
+            `}
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-[#8dceb9] text-sm">Status:</span>
+                <span class="${statusColor.text} text-sm font-medium capitalize">${device.status}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-[#8dceb9] text-sm">Attacks:</span>
+                <span class="${attackColor} text-sm font-bold">${device.attacks}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-[#8dceb9] text-sm">Location:</span>
+                <span class="text-white text-sm">${device.location}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-[#8dceb9] text-sm">Uptime:</span>
+                <span class="text-white text-sm">${device.uptime}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-[#8dceb9] text-sm">IP Address:</span>
+                <span class="text-[#0bda49] text-sm font-mono">${device.ip}</span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-[#39564d] flex gap-2">
+              <button class="flex-1 px-3 py-2 bg-[#39564d] hover:bg-[#4a6b5f] text-white text-xs rounded-lg transition-colors"> Configure </button>
+              <button class="flex-1 px-3 py-2 bg-[#0bda49] hover:bg-[#0bc441] text-black text-xs rounded-lg transition-colors"> Monitor </button>
+            </div>
+          </article>
+        `;
+      }
+
+      // Render device grid function
       function renderDeviceGrid(devices = deviceData) {
         const grid = document.getElementById('device-grid');
         grid.innerHTML = devices.map(device => createDeviceCard(device)).join('');
-        
+        // Rebuild deviceMap for any filtered set so modal can look up
+        devices.forEach(d => deviceMap[d.id] = d);
         // Update statistics
         updateDeviceStats(devices);
       }
-      
+
       // Update device statistics
       function updateDeviceStats(devices) {
         const total = devices.length;
         const online = devices.filter(d => d.status === 'online').length;
         const attacked = devices.filter(d => d.attacks > 0).length;
-        
         document.getElementById('total-devices').textContent = total;
         document.getElementById('online-devices').textContent = online;
         document.getElementById('attacked-devices').textContent = attacked;
-        
-        const healthPercentage = Math.round((online / total) * 100);
+        const healthPercentage = total === 0 ? 0 : Math.round((online / total) * 100);
         document.getElementById('network-health').textContent = healthPercentage + '%';
       }
-      
+
       // Update health check timestamp
       function updateHealthCheckTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-          hour12: false, 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          second: '2-digit' 
-        });
+        const timeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
         document.getElementById('health-check-time').textContent = timeString;
       }
-      
-      // Device modal functionality
+
+      // Show device modal
+      let previouslyFocusedElement = null;
       function showDeviceModal(deviceId) {
-        const device = deviceData.find(d => d.id === deviceId);
+        const device = deviceMap[deviceId];
         if (!device) return;
-        
         const modal = document.getElementById('device-modal');
         const title = document.getElementById('modal-title');
         const content = document.getElementById('device-modal-content');
-        
+
         title.textContent = device.name + ' - Details';
-        
         content.innerHTML = `
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-4">
               <div>
                 <h4 class="text-white font-medium mb-2">Device Information</h4>
                 <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span>Device ID:</span>
-                    <span class="text-white font-mono">${device.id}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Type:</span>
-                    <span class="text-white capitalize">${device.type}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>IP Address:</span>
-                    <span class="text-[#0bda49] font-mono">${device.ip}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Location:</span>
-                    <span class="text-white">${device.location}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Firmware:</span>
-                    <span class="text-white">${device.firmware}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Uptime:</span>
-                    <span class="text-white">${device.uptime}</span>
-                  </div>
+                  <div class="flex justify-between"><span>Device ID:</span> <span class="text-white font-mono">${device.id}</span></div>
+                  <div class="flex justify-between"><span>Type:</span> <span class="text-white capitalize">${device.type}</span></div>
+                  <div class="flex justify-between"><span>IP Address:</span> <span class="text-[#0bda49] font-mono">${device.ip}</span></div>
+                  <div class="flex justify-between"><span>Location:</span> <span class="text-white">${device.location}</span></div>
+                  <div class="flex justify-between"><span>Firmware:</span> <span class="text-white">${device.firmware}</span></div>
+                  <div class="flex justify-between"><span>Uptime:</span> <span class="text-white">${device.uptime}</span></div>
                 </div>
               </div>
             </div>
-            
             <div class="space-y-4">
               <div>
                 <h4 class="text-white font-medium mb-2">Security Status</h4>
                 <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span>Status:</span>
-                    <span class="text-green-400 capitalize">${device.status}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Total Attacks:</span>
-                    <span class="text-red-400 font-bold">${device.attacks}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Last Seen:</span>
-                    <span class="text-white">${device.lastSeen.toLocaleString()}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Risk Level:</span>
-                    <span class="${device.attacks > 10 ? 'text-red-400' : device.attacks > 0 ? 'text-yellow-400' : 'text-green-400'}">
-                      ${device.attacks > 10 ? 'High' : device.attacks > 0 ? 'Medium' : 'Low'}
-                    </span>
-                  </div>
+                  <div class="flex justify-between"><span>Status:</span> <span class="text-green-400 capitalize">${device.status}</span></div>
+                  <div class="flex justify-between"><span>Total Attacks:</span> <span class="text-red-400 font-bold">${device.attacks}</span></div>
+                  <div class="flex justify-between"><span>Last Seen:</span> <span class="text-white">${device.lastSeen.toLocaleString()}</span></div>
+                  <div class="flex justify-between"><span>Risk Level:</span> <span class="${device.attacks > 10 ? 'text-red-400' : device.attacks > 0 ? 'text-yellow-400' : 'text-green-400'}"> ${device.attacks > 10 ? 'High' : device.attacks > 0 ? 'Medium' : 'Low'} </span></div>
                 </div>
               </div>
             </div>
           </div>
-          
           <div class="mt-6 border-t border-[#39564d] pt-4">
             <h4 class="text-white font-medium mb-3">Device Actions</h4>
             <div class="flex gap-2 flex-wrap">
-              <button class="px-4 py-2 bg-[#0bda49] text-black rounded-lg hover:bg-[#0bc441] transition-colors text-sm">
-                Restart Device
-              </button>
-              <button class="px-4 py-2 bg-[#39564d] text-white rounded-lg hover:bg-[#4a6b5f] transition-colors text-sm">
-                Update Firmware
-              </button>
-              <button class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm">
-                Configure Security
-              </button>
-              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
-                Isolate Device
-              </button>
+              <button class="px-4 py-2 bg-[#0bda49] text-black rounded-lg hover:bg-[#0bc441] transition-colors text-sm"> Restart Device </button>
+              <button class="px-4 py-2 bg-[#39564d] text-white rounded-lg hover:bg-[#4a6b5f] transition-colors text-sm"> Update Firmware </button>
+              <button class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"> Configure Security </button>
+              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"> Isolate Device </button>
             </div>
           </div>
         `;
-        
+
+        // Accessibility: show modal and trap focus
         modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        previouslyFocusedElement = document.activeElement;
+        // focus close button
+        const closeBtn = document.getElementById('close-device-modal');
+        closeBtn.focus();
+
+        // setup focus trap
+        trapFocus(modal);
       }
-      
-      // Event listeners
-      document.addEventListener('click', function(e) {
-        // Device card click
-        if (e.target.closest('.device-card')) {
-          const card = e.target.closest('.device-card');
-          const deviceId = card.dataset.deviceId;
-          showDeviceModal(deviceId);
+
+      function hideDeviceModal() {
+        const modal = document.getElementById('device-modal');
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        // restore focus
+        if (previouslyFocusedElement) previouslyFocusedElement.focus();
+      }
+
+      // Simple focus trap for the modal
+      function trapFocus(modal) {
+        const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        const focusable = modal.querySelectorAll(focusableSelectors);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        function handleKeyDown(e) {
+          if (e.key === 'Tab') {
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          } else if (e.key === 'Escape') {
+            hideDeviceModal();
+          }
         }
-        
-        // Close modal
-        if (e.target.id === 'close-device-modal' || e.target.id === 'device-modal') {
-          document.getElementById('device-modal').classList.add('hidden');
+
+        modal.addEventListener('keydown', handleKeyDown);
+        // remove listener when modal hidden
+        const observer = new MutationObserver(() => {
+          if (modal.classList.contains('hidden')) {
+            modal.removeEventListener('keydown', handleKeyDown);
+            observer.disconnect();
+          }
+        });
+        observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+      }
+
+      // Event delegation for device-card clicks
+      document.addEventListener('click', function (e) {
+        const card = e.target.closest('.device-card');
+        if (card) {
+          const deviceId = card.dataset.deviceId;
+          if (deviceId) showDeviceModal(deviceId);
+          return;
+        }
+
+        // close modal actions
+        if (e.target.id === 'close-device-modal') {
+          hideDeviceModal();
+          return;
+        }
+
+        // overlay click closes modal when clicking outside content
+        const modalOverlay = document.getElementById('device-modal');
+        if (e.target === modalOverlay) {
+          hideDeviceModal();
+          return;
         }
       });
-      
+
+      // Close modal on Escape globally
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('device-modal');
+          if (!modal.classList.contains('hidden')) hideDeviceModal();
+        }
+      });
+
       // Filter functionality
-      document.getElementById('status-filter').addEventListener('change', function() {
+      document.getElementById('status-filter').addEventListener('change', function () {
         const statusFilter = this.value;
         const typeFilter = document.getElementById('type-filter').value;
-        
-        let filteredDevices = deviceData;
-        
+        let filteredDevices = deviceData.slice();
         if (statusFilter !== 'all') {
-          if (statusFilter === 'attacked') {
-            filteredDevices = filteredDevices.filter(d => d.attacks > 0);
-          } else {
-            filteredDevices = filteredDevices.filter(d => d.status === statusFilter);
-          }
+          if (statusFilter === 'attacked') filteredDevices = filteredDevices.filter(d => d.attacks > 0);
+          else filteredDevices = filteredDevices.filter(d => d.status === statusFilter);
         }
-        
-        if (typeFilter !== 'all') {
-          filteredDevices = filteredDevices.filter(d => d.type === typeFilter);
-        }
-        
+        if (typeFilter !== 'all') filteredDevices = filteredDevices.filter(d => d.type === typeFilter);
         renderDeviceGrid(filteredDevices);
       });
-      
-      document.getElementById('type-filter').addEventListener('change', function() {
+
+      document.getElementById('type-filter').addEventListener('change', function () {
         document.getElementById('status-filter').dispatchEvent(new Event('change'));
       });
-      
+
       // Refresh devices
-      document.getElementById('refresh-devices').addEventListener('click', function() {
-        // Simulate device status changes
+      document.getElementById('refresh-devices').addEventListener('click', function () {
         deviceData.forEach(device => {
-          if (Math.random() > 0.8) {
-            device.attacks += Math.floor(Math.random() * 3);
-          }
-          if (Math.random() > 0.9) {
-            device.status = device.status === 'online' ? 'offline' : 'online';
-          }
+          if (Math.random() > 0.8) device.attacks += Math.floor(Math.random() * 3);
+          if (Math.random() > 0.9) device.status = device.status === 'online' ? 'offline' : 'online';
           device.lastSeen = new Date();
+          deviceMap[device.id] = device;
         });
-        
         renderDeviceGrid();
         updateHealthCheckTime();
-        
-        // Show refresh feedback
+
+        // show feedback on the button
         const btn = this;
         const originalText = btn.innerHTML;
         btn.innerHTML = '✓ Refreshed';
@@ -560,25 +472,24 @@
           btn.classList.remove('bg-green-600');
         }, 2000);
       });
-      
+
       // Initialize
       renderDeviceGrid();
       updateHealthCheckTime();
-      
-      // Update health check time every 30 seconds
       setInterval(updateHealthCheckTime, 30000);
-      
-      // Simulate real-time device updates every 10 seconds
+
+      // Simulate real-time updates
       setInterval(() => {
         if (Math.random() > 0.7) {
           const randomDevice = deviceData[Math.floor(Math.random() * deviceData.length)];
           randomDevice.attacks += Math.floor(Math.random() * 2);
           randomDevice.lastSeen = new Date();
+          deviceMap[randomDevice.id] = randomDevice;
           renderDeviceGrid();
         }
       }, 10000);
-      
-      console.log('Device Status Page fully initialized');
+
+      console.log('Device Status Page fully initialized (updated)');
     });
   </script>
 </body>
